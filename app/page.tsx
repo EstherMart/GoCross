@@ -22,10 +22,6 @@ export default function Page() {
     <main className="container">
       <h1>Remessas da semana</h1>
       <p className="lede">{lotes.length} lotes · {semana.total} títulos · {brl(lotes.reduce((s, l) => s + l.valor, 0))}</p>
-      <p className="msg resumo">
-        Na semana, {semana.limpos} de {semana.total} títulos ({((semana.limpos / semana.total) * 100).toFixed(1).replace(".", ",")}%) seguem sem ninguém olhar;
-        {" "}{semana.ambiguos} foram retirados com evidência e {semana.criticos} bloqueados. Abra uma remessa para ver os agentes conferindo.
-      </p>
       <section className="card">
         <div className="card-h">Lotes por horário de fechamento</div>
         <div className="scroll">

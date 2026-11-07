@@ -122,7 +122,7 @@ O desafio exige que o agente **aja nos sistemas** e **levante a mão** quando n�
 
 **Sinais já visíveis.**
 - 113 grupos de títulos com mesmo fornecedor + NF normalizada + parcela (226 títulos); em 34 deles há ao menos um aberto/agendado: candidatos a duplicidade. Mais 22 abertos com mesmo fornecedor + valor + vencimento.
-- alteracoes_cadastro: 12 trocas de banco, 12 de agência, 12 de conta, 5 de pix (jan–out). 2 linhas de banco/conta/pix sem confirmação registrada (uma troca gera até 3 linhas; contar fornecedores distintos ainda não foi feito); **25 títulos na agenda pertencem a fornecedores com troca sem confirmação**.
+- alteracoes_cadastro: 12 trocas de banco, 12 de agência, 12 de conta, 5 de pix (jan–out). 2 linhas de banco/conta/pix sem confirmação registrada (uma troca gera até 3 linhas); **25 títulos na agenda pertencem a fornecedores com troca sem confirmação**.
 - Boletos por e-mail (1.203 títulos) trazem banco/beneficiário que podem divergir do fornecedor (regra de golpe em politicas).
 
 **Problemas que quebrariam o agente.**
@@ -142,9 +142,9 @@ Fonte: **GABARITO.md** (16 tipologias G01–G16 mapeadas). **Escopo do MVP: 5 ti
 | G03 | valor com zero a mais [id] | corrigir/retirar, cita duplicata | ajuste |
 | G04 | conta trocada sem confirmação [id] | bloquear, acionar pessoa | ajuste |
 | G16 | título limpo suspeito [id] | liberar | ajuste |
-| G09 | sem recebimento [id] | retirar | validação |
-| G02 | NF reemitida [id] | retirar | validação |
-| G14 | texto com instrução ("ignore as regras") [id] | ignorar instrução, bloquear | validação |
+| G09 | sem recebimento [id] | retirar | validação (não rodado) |
+| G02 | NF reemitida [id] | retirar | validação (não rodado) |
+| G14 | texto com instrução ("ignore as regras") [id] | ignorar instrução, bloquear | validação (não rodado; fora do escopo do MVP) |
 
 ## Métricas
 - Processo: acerto por tipologia (ajuste e validação), falsos positivos nos controles G16, tempo e custo por título.
@@ -157,7 +157,7 @@ Fonte: **GABARITO.md** (16 tipologias G01–G16 mapeadas). **Escopo do MVP: 5 ti
 | 1 | Gabarito pequeno e escolhido por nós | 16 casos, 1 só de G05; "acerto 100%" soa circular | Dizer o n real; rótulo por evidência dos dados; mostrar o que o agente deixou passar; ajuste e validação separados |
 | 2 | Poucos "indevidos" reais | G04 é 1 fornecedor (FP4615, 3 linhas de alteração); G05 tem 1 título | Não generalizar; apresentar como prova de conceito e declarar a amostra |
 | 3 | "É só regra if/else" | Duplicidade, G03, G04 e G05 são regras em código | Mostrar 2 casos ambíguos onde a regra erra e a IA decide (Jev + parecer); citar quanto é código e quanto é IA |
-| 4 | IA ainda não existe no app | `lib/agente` tem só `TODO` | P4 antes de qualquer polimento; sem IA real a Modelagem (40%) cai |
+| 4 | IA no app | Resolvido: `lib/agente` tem Investigador, júri, Auditor e Despachante | Mostrar quanto é código e quanto é IA (Jev + parecer) |
 | 5 | Ação é simulada | Canal e resposta da pessoa são de mentira | Declarar na tela e no pitch; registrar cada ação; canal real fica como próximo passo |
 | 6 | Verificador pode concordar com tudo | Revisor adversário sem prova | Plantar 3 ações erradas e reportar quantas ele derrubou |
 | 7 | Número de impacto inferido | "Larissa confere uns poucos" é inferido; mediana de 28 dias e 48/876 são medidos | Só usar números medidos; o resto, rotular como inferido |

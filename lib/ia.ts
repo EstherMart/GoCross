@@ -46,7 +46,7 @@ async function tentar(rota: string, corpo: unknown): Promise<any | null> {
       method: "POST",
       headers: { Authorization: `Bearer ${chave}`, "Content-Type": "application/json" },
       body: JSON.stringify(corpo),
-      signal: AbortSignal.timeout(12_000),
+      signal: AbortSignal.timeout(7_000),
     });
     if (!r.ok) return null;
     const j = await r.json();
