@@ -9,15 +9,15 @@ type No = { id: NoId; nome: string; papel: string; tipo: "ia" | "ferramenta" | "
 type Linha = { chave: number; tipo: "titulo" | "passo" | "fim"; origem?: Passo["origem"]; agente?: string; texto: string };
 
 const NOS: No[] = [
-  { id: "triagem", nome: "Triagem", papel: "regra exata", tipo: "ferramenta", x: 11, y: 50 },
-  { id: "auditor", nome: "Auditor", papel: "1 em 20", tipo: "ia", x: 35, y: 14 },
-  { id: "investigador", nome: "Investigador", papel: "lê as evidências", tipo: "ia", x: 35, y: 50 },
-  { id: "promotor", nome: "Promotor", papel: "acusa com prova", tipo: "ia", x: 54, y: 30 },
-  { id: "defensor", nome: "Defensor", papel: "defende", tipo: "ia", x: 54, y: 70 },
-  { id: "juiz", nome: "Juiz", papel: "veredito", tipo: "ia", x: 71, y: 50 },
-  { id: "despachante", nome: "Despachante", papel: "bloqueia", tipo: "ferramenta", x: 71, y: 86 },
-  { id: "remessa", nome: "Remessa", papel: "segue ao banco", tipo: "saida", x: 88, y: 14 },
-  { id: "fora", nome: "Fora da remessa", papel: "retirado ou bloqueado", tipo: "saida", x: 88, y: 70 },
+  { id: "triagem", nome: "Triagem", papel: "regra exata", tipo: "ferramenta", x: 10, y: 50 },
+  { id: "auditor", nome: "Auditor", papel: "1 em 20", tipo: "ia", x: 30, y: 14 },
+  { id: "investigador", nome: "Investigador", papel: "lê as evidências", tipo: "ia", x: 30, y: 50 },
+  { id: "promotor", nome: "Promotor", papel: "acusa com prova", tipo: "ia", x: 50, y: 28 },
+  { id: "defensor", nome: "Defensor", papel: "defende", tipo: "ia", x: 50, y: 66 },
+  { id: "juiz", nome: "Juiz", papel: "veredito", tipo: "ia", x: 70, y: 46 },
+  { id: "despachante", nome: "Despachante", papel: "bloqueia", tipo: "ferramenta", x: 70, y: 86 },
+  { id: "remessa", nome: "Remessa", papel: "segue ao banco", tipo: "saida", x: 89, y: 14 },
+  { id: "fora", nome: "Fora da remessa", papel: "retirado ou bloqueado", tipo: "saida", x: 89, y: 64 },
 ];
 
 const ARESTAS: [NoId, NoId][] = [
@@ -31,7 +31,7 @@ const NO_DO_AGENTE: Record<Passo["agente"], NoId> = {
   Código: "triagem", Investigador: "investigador", Promotor: "promotor", Defensor: "defensor", Juiz: "juiz", Auditor: "auditor", Despachante: "despachante",
 };
 
-const PASSO_MS = 1100;
+const PASSO_MS = 700;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const POS = Object.fromEntries(NOS.map((n) => [n.id, n])) as Record<NoId, No>;
 
@@ -55,14 +55,21 @@ export function Orquestracao({ fluxo, ids = [], casos = [], titulo }: Props) {
   const [atual, setAtual] = useState<{ id: string; passos: Passo[] } | null>(null);
   const viva = useRef(true);
   const contador = useRef(0);
+  const emCurso = useRef(false);
 
-  useEffect(() => () => { viva.current = false; }, []);
+  // viva volta a true a cada montagem (o Strict Mode do dev desmonta e remonta e deixava tudo parado).
+  useEffect(() => {
+    viva.current = true;
+    if (lista.length) rodar();
+    return () => { viva.current = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const lista = casos.length ? casos.map((c) => c.tituloId) : ids;
   const obter = (id: string): Promise<Caso> =>
     Promise.resolve(casos.find((c) => c.tituloId === id) ?? fetch(`/api/conferir?id=${id}`).then((r) => r.json()));
 
-  const escrever = (l: Omit<Linha, "chave">) => setLog((atual) => [...atual.slice(-9), { ...l, chave: contador.current++ }]);
+  const escrever = (l: Omit<Linha, "chave">) => setLog((atual) => [...atual.slice(-40),{ ...l, chave: contador.current++ }]);
 
   async function tocar(c: Caso) {
     let vistos: NoId[] = [];
@@ -89,26 +96,32 @@ export function Orquestracao({ fluxo, ids = [], casos = [], titulo }: Props) {
     await sleep(PASSO_MS);
   }
 
+  // Demo: roda sozinha ao abrir e repete a cada 4 s; o botão só reinicia.
   async function rodar() {
-    setRodando(true);
-    setFeito(false);
-    setLog([]);
-    setProgresso(0);
-    const pendentes = lista.map(obter);
-    for (const [i, p] of pendentes.entries()) {
-      try {
-        await tocar(await p);
-      } catch {
-        escrever({ tipo: "fim", texto: `${lista[i]}: falha ao conferir` });
+    if (emCurso.current) return;
+    emCurso.current = true;
+    while (viva.current) {
+      setRodando(true);
+      setFeito(false);
+      setLog([]);
+      setProgresso(0);
+      const pendentes = lista.map(obter);
+      for (const [i, p] of pendentes.entries()) {
+        try {
+          await tocar(await p);
+        } catch {
+          escrever({ tipo: "fim", texto: `${lista[i]}: falha ao conferir` });
+        }
+        if (!viva.current) return;
+        setProgresso(i + 1);
       }
-      if (!viva.current) return;
-      setProgresso(i + 1);
+      setAtivo(null);
+      setVisitados([]);
+      setArestas([]);
+      setRodando(false);
+      setFeito(true);
+      await sleep(4000);
     }
-    setAtivo(null);
-    setVisitados([]);
-    setArestas([]);
-    setRodando(false);
-    setFeito(true);
   }
 
   const contagem: Partial<Record<NoId, number>> = {
@@ -120,6 +133,7 @@ export function Orquestracao({ fluxo, ids = [], casos = [], titulo }: Props) {
   const dizeres = sel && atual ? atual.passos.filter((p) => NO_DO_AGENTE[p.agente] === sel) : [];
 
   return (
+    <>
     <section className="palco sec" aria-label={titulo}>
       <header className="palco-h">
         <span className="palco-t">{titulo}</span>
@@ -169,17 +183,22 @@ export function Orquestracao({ fluxo, ids = [], casos = [], titulo }: Props) {
           )}
         </div>
 
-        <ol className="terminal" aria-live="polite">
-          {log.length === 0 && <li className="vazio">aguardando conferência</li>}
-          {log.map((l) => (
-            <li key={l.chave} className={`${l.tipo} ${l.origem ?? ""}`}>
-              {l.tipo === "titulo" && <>▸ {l.texto}</>}
-              {l.tipo === "passo" && <><b>{l.agente}</b> {l.texto}</>}
-              {l.tipo === "fim" && <>↳ {l.texto}</>}
-            </li>
-          ))}
-        </ol>
       </div>
     </section>
+
+    <section className="palco sec" aria-label="Registro dos agentes">
+      <header className="palco-h"><span className="palco-t">Registro dos agentes · ao vivo</span></header>
+      <ol className="terminal" aria-live="polite">
+        {log.length === 0 && <li className="vazio">aguardando conferência</li>}
+        {log.map((l) => (
+          <li key={l.chave} className={`${l.tipo} ${l.origem ?? ""}`}>
+            {l.tipo === "titulo" && <>▸ {l.texto}</>}
+            {l.tipo === "passo" && <><b>{l.agente}</b> {l.texto}</>}
+            {l.tipo === "fim" && <>↳ {l.texto}</>}
+          </li>
+        ))}
+      </ol>
+    </section>
+    </>
   );
 }

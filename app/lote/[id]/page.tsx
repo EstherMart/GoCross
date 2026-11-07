@@ -10,7 +10,10 @@ export const dynamic = "force-dynamic";
 
 export default async function Page({ params }: { params: { id: string } }) {
   const r = await processarLote(params.id);
-  const casosDoLote = [...r.excecoes.slice(0, 6), ...r.liberados.filter((d) => d.auditoria).slice(0, 1)].map(casoDe);
+  const base = [...r.excecoes.slice(0, 6), ...r.liberados.filter((d) => d.auditoria).slice(0, 1)];
+  // Lote sem exceção também precisa tocar: completa com alguns liberados.
+  const extras = r.liberados.filter((d) => !base.includes(d)).slice(0, Math.max(0, 3 - base.length));
+  const casosDoLote = [...base, ...extras].map(casoDe);
 
   return (
     <main className="container">

@@ -28,7 +28,7 @@ export function Excecao({ d }: { d: DecisaoLote }) {
             </li>
           ))}
         </ol>
-        {d.pedido && <p className="msg"><strong>Encaminhado a {d.pedido.nome}</strong> para registro (canal simulado). Fraude vai ao jurídico; valor acima de R$ 50 mil, à diretoria financeira; demais casos, à coordenação.</p>}
+        {d.pedido && <p className="msg"><strong>→ {d.pedido.nome}</strong> · canal simulado</p>}
       </div>
     </details>
   );

@@ -4,7 +4,20 @@ import { classificar } from "./niveis";
 import { coletarSinais } from "./sinais";
 import type { Decisao } from "./tipos";
 
-export async function decidir(tituloId: string): Promise<Decisao> {
+// Memória do processo: cada título passa pela IA uma vez por sessão do servidor (reiniciar limpa).
+const memo = new Map<string, Promise<Decisao>>();
+
+export function decidir(tituloId: string): Promise<Decisao> {
+  let p = memo.get(tituloId);
+  if (!p) {
+    p = decidirSemMemo(tituloId);
+    memo.set(tituloId, p);
+    p.catch(() => memo.delete(tituloId));
+  }
+  return p;
+}
+
+async function decidirSemMemo(tituloId: string): Promise<Decisao> {
   const titulo = tituloPorId(tituloId);
   if (!titulo) return classificar(tituloId, [], false);
   let d = classificar(tituloId, coletarSinais(titulo), true);

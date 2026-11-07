@@ -86,13 +86,12 @@ tbody tr:hover { background: #fafafa; }
 .palco-t::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--lima); }
 .palco-acoes { display: flex; align-items: center; gap: 12px; }
 .progresso { font-family: var(--mono); font-size: 12px; color: rgba(255, 255, 255, 0.75); }
-.palco-corpo { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: stretch; }
+.palco-corpo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: stretch; }
 .rolagem { overflow-x: auto; }
 .grafo { position: relative; min-width: 720px; aspect-ratio: 1000 / 420; }
 .grafo svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .aresta { fill: none; stroke: var(--linha); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
-.aresta.on { stroke: var(--lima); stroke-width: 2; stroke-dasharray: 6 5; animation: fluxo 0.9s linear infinite; }
-@keyframes fluxo { to { stroke-dashoffset: -11; } }
+.aresta.on { stroke: var(--lima); stroke-width: 2; }
 
 /* Nós: cartões claros e sóbrios; a cor fica numa barra lateral e a lima só marca o que está ativo */
 .no { position: absolute; transform: translate(-50%, -50%); width: 132px; padding: 8px 10px 8px 14px; border-radius: 8px; text-align: left; background: #fff; color: #1d2b44; border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); font: inherit; cursor: pointer; transition: background 0.25s, box-shadow 0.25s; }
@@ -105,7 +104,7 @@ tbody tr:hover { background: #fafafa; }
 .no-p { display: block; font-size: 10.5px; color: #5b6b86; }
 .no-e { display: block; margin-top: 4px; font-family: var(--mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.6px; color: #8090aa; }
 .no.visto .no-e { color: var(--azul); }
-.no.ativo { box-shadow: 0 0 0 2px var(--lima), 0 0 18px 2px rgba(215, 217, 0, 0.45); }
+.no.ativo { box-shadow: 0 0 0 2px var(--lima); }
 .no.ativo .no-e { color: #1d2b44; font-weight: 700; }
 .no.sel { outline: 1.5px solid var(--ciano); outline-offset: 3px; }
 .no-c { position: absolute; top: -8px; right: -8px; min-width: 24px; padding: 0 6px; border-radius: 999px; background: var(--palco); color: #fff; border: 1px solid rgba(255, 255, 255, 0.5); font-family: var(--mono); font-size: 10.5px; font-weight: 600; line-height: 18px; text-align: center; }
@@ -113,7 +112,7 @@ tbody tr:hover { background: #fafafa; }
 .detalhe { margin-top: 12px; padding: 10px 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--linha); font-size: 13px; line-height: 1.45; }
 .detalhe p { margin: 6px 0 0; color: rgba(255, 255, 255, 0.8); }
 
-.terminal { list-style: none; margin: 0; padding: 12px 14px; border-radius: 8px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--linha); font-family: var(--mono); font-size: 11.5px; line-height: 1.5; min-height: 220px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; overflow: hidden; }
+.terminal { list-style: none; margin: 0; padding: 12px 14px; border-radius: 8px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--linha); font-family: var(--mono); font-size: 13px; line-height: 1.55; height: 280px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; overflow: hidden; }
 .terminal li { overflow-wrap: anywhere; }
 .terminal .vazio { color: rgba(255, 255, 255, 0.5); }
 .terminal .titulo { color: #fff; font-weight: 700; margin-top: 6px; }
