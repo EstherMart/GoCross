@@ -1,4 +1,4 @@
-<p align="center"><img src="public/logo.jpg" alt="GoCross" width="420"></p>
+<p align="center"><img src="public/logo-nome.png" alt="GoCross" width="320"></p>
 
 # GoCross
 

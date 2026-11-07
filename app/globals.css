@@ -37,14 +37,12 @@ body {
   align-items: center;
   gap: 12px;
 }
-/* Recorte do wordmark de public/logo.jpg (2752x1536; região x835 y940 1090x220) */
+/* Só o nome: public/logo-nome.png (recorte do wordmark de logo.jpg, 1120x250) */
 .logo {
   display: block;
-  width: 158px;
+  width: 144px;
   height: 32px;
-  background: url("/logo.jpg") no-repeat;
-  background-size: 399px auto;
-  background-position: -121px -136px;
+  background: url("/logo-nome.png") no-repeat center / contain;
 }
 .topbar .sub { color: var(--muted); font-size: 14px; }
 
