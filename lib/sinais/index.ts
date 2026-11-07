@@ -10,13 +10,14 @@ const DIA = 86_400_000;
 const dias = (a: string, b: string) => Math.round((Date.parse(a) - Date.parse(b)) / DIA);
 
 // G01 · duplicidade: mesmo fornecedor + NF normalizada + parcela. Retira o lançado depois.
+// politicas.csv não tem regra explícita de duplicidade: cita-se tres_vias.regra (OC x NF x título, um título por duplicata).
 const g01: Detector = (t) => {
   if (!nfNormalizada(t.numero_nf_digitado)) return []; // aluguel e utilidades não têm NF: a chave colidiria entre meses
   const outros = (indices().chaveTitulo.get(chaveTitulo(t)) ?? []).filter(
     (o) => o.titulo_id !== t.titulo_id && o.data_lancamento < t.data_lancamento && o.status !== "cancelado",
   );
   if (outros.length === 0) return [];
-  return [{ tipologia: "G01", nivel: 2, regra: "tres_vias.duplicidade", evidencia: `Mesma NF e parcela já lançadas em ${outros.map((o) => o.titulo_id).join(", ")}` }];
+  return [{ tipologia: "G01", nivel: 2, regra: "tres_vias.regra", evidencia: `Mesma NF e parcela já lançadas em ${outros.map((o) => o.titulo_id).join(", ")}` }];
 };
 
 // G03 · valor ≠ duplicata (a maioria dos casos reais é dígito a menos). Aceita ±R$ 0,10 e multa 2% + juros 1%/mês.

@@ -1,12 +1,12 @@
 {
-  "name": "gohacks-colega-digital",
+  "name": "gocross",
   "private": true,
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "avaliar": "tsx scripts/avaliar.ts"
+    "avaliar": "tsx --env-file-if-exists=.env.local scripts/avaliar.ts"
   },
   "dependencies": {
     "next": "14.2.15",

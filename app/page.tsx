@@ -10,9 +10,7 @@ export default function Page() {
   return (
     <main className="container">
       <h1>Remessas</h1>
-      <p className="lede">
-        {lotes.length} lotes na agenda. O agente confere cada título antes do fechamento e libera, retira ou bloqueia sozinho. Pessoa só no crítico.
-      </p>
+      <p className="lede">{lotes.length} lotes na agenda</p>
       <section className="card">
         <div className="card-h">Fila de lotes</div>
         <div className="scroll">
@@ -36,7 +34,6 @@ export default function Page() {
           </table>
         </div>
       </section>
-      <p className="foot">GoCross · GoHacks Talent 2026. Canal de decisão simulado.</p>
     </main>
   );
 }

@@ -1,84 +1,113 @@
+<p align="center"><img src="img/logo.jpg" alt="GoCross" width="360"></p>
+
 # GoCross
 
-> Um colega digital que confere cada pagamento antes de a remessa fechar.
+**Triagem automática de títulos a pagar antes do fechamento da remessa.** Cada título do lote é classificado em três níveis de criticidade; o sistema libera, retira ou bloqueia com evidência citada e só aciona uma pessoa quando há risco de fraude ou o valor foge da alçada.
 
-Projeto individual do **GoHacks Talent 2026** (Fortaleza, 07 e 08/11), desafio **Pagamentos**.
+MVP do **GoHacks Talent 2026** (Fortaleza, 07 e 08/11) · desafio **Pagamentos** · Demo: [CONFIRMAR]
 
-## O problema
+## Problema
 
-Todo mês saem milhares de pagamentos. O cadastro é manual, em vários sistemas, e ninguém consegue conferir título a título. Hoje o lote é assinado quase sem checagem, e o dinheiro indevido (duplicidade, valor errado, troca de conta, boleto de outro CNPJ) sai junto.
+Pagamentos em volume, cadastro manual em vários sistemas e nenhuma conferência título a título. O lote é assinado quase sem checagem e o dinheiro indevido (duplicidade, valor digitado errado, troca de conta, boleto de outra raiz de CNPJ) sai junto. Usuária-chave: a analista de contas a pagar que fecha a remessa.
 
-## A solução
+## Solução
 
-O GoCross percorre cada título do lote **antes** do fechamento da remessa e age:
+Pipeline por título, executado **antes** da remessa. O crítico sempre vence: um sinal de nível 3 nunca é liberado por um nível menor.
 
-| Nível | O que é | O que o GoCross faz |
-|-------|---------|---------------------|
-| 1 · Baixo | Rotina, sem sinal de risco | Libera sozinho |
-| 2 · Médio | Erro provável (ex.: duplicidade, valor divergente) | Retira do lote e explica o motivo |
-| 3 · Crítico | Risco de fraude ou acima da alçada | Bloqueia e pede decisão a uma pessoa, com dossiê curto |
+| Nível | Critério | Ação automática | Humano |
+|-------|----------|-----------------|--------|
+| 1 · baixo | Divergência de forma, dentro da tolerância | Libera (corrige erro de digitação evidente) | Não |
+| 2 · médio | Dinheiro possivelmente indevido, ação reversível, dentro da alçada de R$ 5 mil | Retira do lote com evidência | Não |
+| 3 · crítico | Fraude, golpe ou decisão fora da alçada do agente | Bloqueia, monta dossiê e pede decisão | Sim |
 
-Regras: o nível crítico vence, título não reconhecido não é liberado e pessoa só entra no nível 3.
+Regras de projeto:
+- **Falha fechada:** título não reconhecido, ou IA indisponível (sem chave), não é liberado.
+- **Parte numérica em código**, determinística e barata. A IA só entra no caso ambíguo do nível 2, no parecer e na revisão.
+- **Texto de terceiros é dado, nunca instrução** (e-mail, NF, WhatsApp). Mitiga prompt injection.
+- **Despachante por regra, não por IA:** fraude → PS08; valor acima de R$ 50 mil → PS03; demais casos críticos → PS01.
 
-**Para quem:** a analista de contas a pagar que fecha a remessa. O GoCross assume a conferência repetitiva; ela decide as exceções.
+## Arquitetura
 
-## Tipologias do MVP
+```
+CSV (data/) → lib/dados + normalizar → lib/sinais (G01 G03 G04 G05, código)
+            → lib/indices → lib/motor (nível, crítico vence)
+            → lib/agente  (Jev no ambíguo · parecer glm · revisor adversário · despachante)
+            → lib/remessa (remessa filtrada + fila de decisões) → telas Next.js
+```
 
-G01 duplicidade · G03 valor divergente da duplicata · G04 troca bancária sem confirmação · G05 boleto com CNPJ de outra raiz · G16 controles (casos que parecem erro mas são legítimos e não podem ser barrados).
+| Agente | Papel |
+|--------|-------|
+| Investigador | Níveis 1 e 2: coleta evidência e age |
+| Revisor adversário | Pergunta se a ação pode prejudicar pagamento legítimo e confere se o parecer só cita valores, NF e CNPJ que existem nos dados |
+| Despachante | Nível 3: dossiê, pedido de decisão, registro da resposta |
 
-## Como funciona
+Chamadas de IA pelo [AI Proxy](https://ai-proxy.gogroupbr.com); a chave fica só em `AI_PROXY_API_KEY`.
 
-- Os CSV são processados **em código**. A IA entra só nos casos ambíguos, para decidir e escrever o parecer.
-- Um revisor independente checa se o parecer cita só valores, NF e CNPJ que existem nos dados.
-- Texto de e-mail, NF e WhatsApp é tratado como dado, nunca como instrução.
+## Escopo do MVP (fatia vertical)
 
-## Stack
+| Código | Tipologia |
+|--------|-----------|
+| G01 | Duplicidade |
+| G03 | Valor digitado diferente da duplicata |
+| G04 | Troca bancária sem confirmação válida |
+| G05 | Boleto com beneficiário de outra raiz de CNPJ |
+| G16 | Controles: casos legítimos que parecem erro e **não** podem ser barrados |
 
-Next.js 14 + TypeScript, publicado na Vercel. IA pelo AI Proxy (a chave fica só em variável de ambiente).
+Fora do MVP: canal real de acionamento (hoje simulado na tela e declarado como tal), demais tipologias, integração com ERP.
+
+## Telas
+
+| Rota | Conteúdo |
+|------|----------|
+| `/` | Fila de remessas com semáforo por nível |
+| `/lote/[id]` | Diagnóstico final, rastro de decisão e pedidos de decisão |
+| `/prova` | Amostra, erros, código × IA, revisor, custo, **medido × inferido** |
 
 ## Como rodar
 
-Precisa de Node 20+.
+Node 20+.
 
 ```bash
 npm install
 cp .env.example .env.local   # preencha AI_PROXY_API_KEY
-npm run dev                  # abre o lote RM20261103-MER
+npm run dev                  # http://localhost:3000
 npm run avaliar              # acerto por tipologia e placar em R$
+npx tsc --noEmit && npm run build
 ```
 
-Os dados ficam em `data/` e **não são versionados**. Coloque a pasta `pagamentos` lá antes de rodar.
+Os dados ficam em `data/` e **não são versionados**: coloque a pasta `pagamentos` lá antes de rodar.
+
+## Deploy (Vercel)
+
+1. Importe o repositório na Vercel (framework Next.js, sem configuração extra).
+2. Em *Settings → Environment Variables*, defina `AI_PROXY_API_KEY`.
+3. Os CSV não estão no git; defina como o app os lê em produção [CONFIRMAR com o mentor].
+
+## Validação e limites
+
+- Gabarito: **16/16** (ajuste 8/8, validação 8/8) e 0 falso positivo no G16. Os detectores foram ajustados olhando esses mesmos casos, **por isso não é taxa de detecção**.
+- Custo, revisor e comparação código × IA aparecem como "não medido" até a chave ser configurada e `npm run avaliar` rodar com IA.
+- Fronteira entre níveis 2 e 3 (comprador e aprovador acima de R$ 5 mil) ainda aguarda confirmação do mentor.
+- Diferencial planejado: red team × blue team com cenários sintéticos e placar de barrados × passaram. Só com OK do mentor, separado de `data/gabarito/`.
 
 ## Estrutura
 
 ```
-app/               tela do lote e rota /api/lote
-lib/dados.ts       leitura dos CSV
-lib/normalizar.ts  CNPJ, raiz de CNPJ, número de NF
-lib/sinais/        detectores em código, por nível
-lib/niveis.ts      classificação (o crítico vence)
-lib/agente/        IA nos casos ambíguos e revisor
+app/               telas e rotas /api
+lib/sinais/        detectores em código
+lib/motor.ts       classificação por nível
+lib/agente/        IA no ambíguo, revisor e despachante
+lib/ia.ts          cliente do AI Proxy
 lib/remessa.ts     remessa filtrada e fila de decisões
-scripts/avaliar.ts acerto por tipologia sobre data/gabarito/gabarito.csv
-docs/              requisitos, gabarito, ideias, AI_LOG e handoff
+lib/prova.ts       métricas da tela /prova
+scripts/avaliar.ts acerto por tipologia contra o gabarito
+docs/              requisitos, gabarito, ideias, AI_LOG, handoff
 ```
 
-## Estado
+## Uso de IA no desenvolvimento
 
-Esqueleto de ponta a ponta com a nova interface. Os detectores e o agente de IA ainda estão sendo implementados, então hoje todo título sai como "liberar". O acompanhamento está em [docs/HANDOFF.md](docs/HANDOFF.md).
-
-## Como usamos IA
-
-Cada correção feita à IA está registrada em [docs/AI_LOG.md](docs/AI_LOG.md), com o antes e o depois.
-
-## Documentação
+Cada correção feita à IA está em [docs/AI_LOG.md](docs/AI_LOG.md), com antes e depois.
 
 [Requisitos](docs/REQUISITOS.md) · [Gabarito](docs/GABARITO.md) · [Ideias](docs/IDEIAS.md) · [AI_LOG](docs/AI_LOG.md) · [Handoff](docs/HANDOFF.md)
 
-## Quem fez
-
 Luiza Martins · GoHacks Talent 2026
-
-Demo: [CONFIRMAR]
-
-Plano de estudo usado no evento: [Plano GoHacks Talent.html](Plano%20GoHacks%20Talent.html) (local, fora do GitHub).
