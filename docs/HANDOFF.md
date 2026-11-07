@@ -11,7 +11,8 @@ Colega digital (nome em aberto: Tita, Portão, Confere, Remi) que confere cada t
 
 ## Quebrado / falta
 - lib/sinais: nenhum detector (nivel1/2/3 vazios). Sem detector, todo título sai "liberar": a tela não prova nada ainda.
-- lib/agente: só TODO. Nenhuma chamada de IA. Sem node_modules (npm install não rodado).
+- lib/agente: só TODO. Nenhuma chamada de IA.
+- P0 feito: npm install ok, .env.example com AI_PROXY_API_KEY. Linha de base do avaliar: G01 0/3, G03 0/4, G04 0/3, G05 0/1, G16 5/5; placar -R$ 212.602,89.
 - Controles G16 ainda não checados contra recebimento, OC e cadastro (TP432883 parece aluguel recorrente).
 
 ## Decisões
@@ -27,7 +28,7 @@ Colega digital (nome em aberto: Tita, Portão, Confere, Remi) que confere cada t
 - Plano GoHacks Talent.html não vai para o GitHub (está no .gitignore).
 
 ## Próxima ação
-P0 (npm install, .env.example com AI_PROXY_API_KEY), depois P3 (detectores G04, G05, G01, G03). Rodar /usage e anotar o uso real. Perguntas ao mentor: casos injetados, canal real, fronteira do nível 2.
+P3 (detectores G04, G05, G01, G03), depois P4 (IA). Rodar /usage e anotar o uso real. Perguntas ao mentor (urgentes): casos injetados, canal real, fronteira do nível 2. Rodar: PATH com C:\Program Files\nodejs, npm run avaliar / npm run dev.
 
 ## Arquivos-chave
 docs/ (REQUISITOS, GABARITO, HANDOFF, AI_LOG), data/gabarito/gabarito.csv, lib/sinais/index.ts, lib/agente/index.ts, lib/remessa.ts, app/page.tsx
