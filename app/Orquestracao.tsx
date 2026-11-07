@@ -104,32 +104,29 @@ export function Orquestracao({ fluxo, ids = [], casos = [], titulo }: Props) {
     await sleep(PASSO_MS);
   }
 
-  // Demo: roda sozinha ao abrir e repete a cada 4 s; o botão só reinicia.
+  // Roda uma vez ao abrir, para no último título e mantém o registro; o botão reinicia do zero.
   async function rodar() {
     if (emCurso.current) return;
     emCurso.current = true;
-    while (viva.current) {
-      setRodando(true);
-      setFeito(false);
-      setLog([]);
-      setProgresso(0);
-      const pendentes = lista.map(obter);
-      for (const [i, p] of pendentes.entries()) {
-        try {
-          await tocar(await p);
-        } catch {
-          escrever({ tipo: "fim", texto: `${lista[i]}: falha ao conferir` });
-        }
-        if (!viva.current) return;
-        setProgresso(i + 1);
+    setRodando(true);
+    setFeito(false);
+    setLog([]);
+    setProgresso(0);
+    const pendentes = lista.map(obter);
+    for (const [i, p] of pendentes.entries()) {
+      try {
+        await tocar(await p);
+      } catch {
+        escrever({ tipo: "fim", texto: `${lista[i]}: falha ao conferir` });
       }
-      setAtivo(null);
-      setVisitados([]);
-      setArestas([]);
-      setRodando(false);
-      setFeito(true);
-      await sleep(4000);
+      if (!viva.current) { emCurso.current = false; return; }
+      setProgresso(i + 1);
     }
+    setAtivo(null);
+    setRodando(false);
+    setFeito(true);
+    escrever({ tipo: "fim", texto: `conferência concluída: ${lista.length} título(s)` });
+    emCurso.current = false;
   }
 
   const contagem: Partial<Record<NoId, number>> = {

@@ -113,3 +113,9 @@ Formato de cada entrada:
 - **Pedi / IA fez / Como detectei / Correção:** pedi resolver o delay de "Abrir e conferir" / IA criou tela de loading com texto explicativo ("Triagem por regra... júri só nos ambíguos") / revisando a proposta, não quero tela intermediária / loading removido; delay atacado com cache de IA em disco aquecido (IA_CACHE=1), tentativa única na IA e fatias de 24 títulos.
 - **Resultado (antes→depois):** [CONFIRMAR]
 - **Aprendizado:** resolver a lentidão na causa, sem esconder atrás de tela de espera nem texto extra.
+
+## [CONFIRMAR] Orquestração reiniciava em vez de parar
+- **Tipo:** correção
+- **Pedi / IA fez / Como detectei / Correção:** pedi o agente conferindo o lote na tela / IA deixou a orquestração em loop (repetia a cada 4 s e apagava o registro) / ao ver que, depois do último ambíguo, o registro do lote reiniciava / roda uma vez, para no último título, mantém o registro e fecha com "conferência concluída"; "Rodar de novo" reinicia.
+- **Resultado (antes→depois):** [CONFIRMAR]
+- **Aprendizado:** o critério de parada do agente precisa aparecer também na tela; loop de vitrine passa a impressão de que ele não termina.
