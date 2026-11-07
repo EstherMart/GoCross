@@ -1,4 +1,4 @@
-import { despachar, investigar, revisar } from "./agente";
+import { auditarLimpo, despachar, investigar, revisar } from "./agente";
 import { tituloPorId } from "./dados";
 import { classificar } from "./niveis";
 import { coletarSinais } from "./sinais";
@@ -12,5 +12,6 @@ export async function decidir(tituloId: string): Promise<Decisao> {
   d.rastro = [{ agente: "Código", origem: "codigo", texto: d.nivel === 1 ? "Sem sinais de risco: liberado." : `Sinais: ${d.evidencias.join(" · ")}` }];
   d = await investigar(titulo, d);
   d = await revisar(titulo, d);
+  d = await auditarLimpo(titulo, d);
   return despachar(titulo, d);
 }

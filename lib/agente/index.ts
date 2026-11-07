@@ -58,6 +58,26 @@ export async function revisar(t: Linha, d: Decisao): Promise<Decisao> {
   return com(d, { agente: "Revisor", origem: "ia", texto: `Aprovou a ação (${pct}% de risco).` });
 }
 
+// Auditor do limpo: o código libera sozinho o nível 1 e ninguém olhava esses títulos.
+// Amostra fixa e declarada (1 a cada AUDITORIA_1_EM, escolhida por hash do id). Só mede: não muda a decisão,
+// porque com poucos campos o auditor geraria acionamentos à toa (R$ 60 cada, politicas.csv).
+export const AUDITORIA_1_EM = 20;
+
+export const naAmostraDoLimpo = (tituloId: string) =>
+  [...tituloId].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % AUDITORIA_1_EM === 0;
+
+export async function auditarLimpo(t: Linha, d: Decisao): Promise<Decisao> {
+  if (d.nivel !== 1 || !iaDisponivel() || !naAmostraDoLimpo(d.tituloId)) return d;
+  const r = await jev(
+    { titulo: t.titulo_id, valor: t.valor, parcela: t.parcela, fornecedor: t.fornecedor_id },
+    { passou: { type: "noul", instructions: "Este título foi liberado sem sinais de risco. Há indício de erro ou fraude que o código pode ter deixado passar?" } },
+  );
+  const risco = Number(r?.answers?.passou?.noul);
+  if (!Number.isFinite(risco)) return d;
+  const pct = (risco * 100).toFixed(0);
+  return { ...com(d, { agente: "Revisor", origem: "ia", texto: `Auditoria da amostra do limpo: ${pct}% de risco de algo ter passado (só mede, não altera).` }), auditoria: { risco } };
+}
+
 // Despachante (nível 3): dossiê curto e pedido à pessoa certa. Canal simulado, dito na tela.
 export function despachar(t: Linha, d: Decisao): Decisao {
   if (d.nivel !== 3) return d;

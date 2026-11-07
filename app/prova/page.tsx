@@ -1,6 +1,7 @@
 import { calcularProva } from "@/lib/prova";
 import { usoTotal } from "@/lib/ia";
 import { brl } from "@/lib/formato";
+import { AUDITORIA_1_EM } from "@/lib/agente";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,24 @@ export default async function Page() {
             {p.iaAtiva ? "" : " IA desligada nesta execução (sem AI_PROXY_API_KEY): zero chamadas."}
           </p>
           <p className="foot">Detectores de duplicidade, valor × duplicata, troca bancária e boleto são código. A IA lê só os ambíguos (nível 2) e o revisor questiona cada ação.</p>
+        </div>
+      </section>
+
+      <section className="card sec">
+        <div className="card-h">Quem olha o que o código liberou?</div>
+        <div className="pad">
+          {p.auditoria.amostrados === 0 ? (
+            <p>Não medido: precisa de AI_PROXY_API_KEY para auditar a amostra dos títulos limpos.</p>
+          ) : (
+            <p>
+              Amostra fixa de 1 a cada {AUDITORIA_1_EM} títulos liberados: <strong>{p.auditoria.amostrados}</strong> auditados pela IA,{" "}
+              <strong>{p.auditoria.questionados}</strong> com risco de {p.auditoria.limiar * 100}% ou mais. A auditoria só mede; não muda a decisão.
+            </p>
+          )}
+          <p className="foot">
+            Os {p.agenda.porCodigo} títulos decididos por código são o agente agindo com ferramenta determinística (exata e barata); a IA entra onde há julgamento.
+            Um questionado não é prova de fraude: é onde um humano olharia primeiro.
+          </p>
         </div>
       </section>
 

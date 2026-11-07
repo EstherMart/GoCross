@@ -33,4 +33,5 @@ export type Decisao = {
   rastro: Passo[];
   decididoPor: "codigo" | "ia"; // "ia" quando a IA confirmou ou mudou uma decisão ambígua
   pedido?: Pedido; // só no nível 3: a pessoa é acionada
+  auditoria?: { risco: number }; // amostra de títulos limpos: risco de ter passado algo (0 a 1); só mede, não muda a decisão
 };

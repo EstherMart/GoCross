@@ -74,3 +74,21 @@ Formato de cada entrada:
 - **Correção:** tema centralizado em app/globals.css (cabeçalho GoCross, cartões de resumo, tabela e selos de nível). Os valores de cor e fonte são provisórios: a IA não tem acesso ao design system da Gocase, então trocar pelos tokens oficiais é [CONFIRMAR].
 - **Resultado (antes→depois):** [CONFIRMAR] sem medição; só revisão visual.
 - **Aprendizado:** passar o design system real (tokens ou link) antes de pedir interface, para a IA não adivinhar o padrão.
+
+## [CONFIRMAR] Regra citada que não existe no politicas.csv (G01)
+- **Tipo:** correção
+- **Pedi:** explicar de onde vêm as regras e como justificar cada uma.
+- **IA fez:** o detector G01 citava `tres_vias.duplicidade`, uma chave que parece oficial mas não está no politicas.csv.
+- **Como detectei:** ao ler o politicas.csv para responder, a chave não apareceu em nenhuma linha.
+- **Correção:** G01 passou a citar `tres_vias.regra` (OC x NF x título) com comentário no código dizendo que é interpretação, porque o arquivo não tem regra explícita de duplicidade.
+- **Resultado (antes→depois):** gabarito 16/16 e 0 falso positivo no G16, iguais antes e depois.
+- **Aprendizado:** toda regra citada precisa existir nos dados; conferir a chave contra o politicas.csv antes de escrever.
+
+## [CONFIRMAR] Script de avaliação sem a chave de IA
+- **Tipo:** correção
+- **Pedi:** rodar a avaliação com a chave já preenchida no .env.local.
+- **IA fez:** o `npm run avaliar` (tsx) não carregava o .env.local, então saiu "sem AI_PROXY_API_KEY" mesmo com a chave preenchida.
+- **Como detectei:** a saída mostrou "IA: 0 chamadas" e "Revisor: não rodado".
+- **Correção:** script passou a usar `--env-file-if-exists=.env.local`.
+- **Resultado (antes→depois):** IA de 0 chamadas para 76 chamadas (US$ 0,000987); títulos por IA de 0 para 21 de 876; revisor de "não rodado" para 3/3 ações plantadas derrubadas.
+- **Aprendizado:** conferir a saída do script depois de configurar a chave, não só o arquivo.

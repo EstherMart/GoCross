@@ -19,9 +19,12 @@ export type Prova = {
   falsosPositivos: number; // controles G16 retidos ou bloqueados
   origens: string[];
   agenda: { titulos: number; liberados: number; retirados: number; bloqueados: number; porCodigo: number; porIA: number };
+  auditoria: { amostrados: number; questionados: number; limiar: number }; // amostra dos limpos revisada pela IA
   revisor: { rodado: boolean; plantadas: number; derrubou: number };
   iaAtiva: boolean;
 };
+
+const LIMIAR_AUDITORIA = 0.5; // risco da auditoria a partir do qual o título conta como "questionado"
 
 const arq = () => path.join(process.cwd(), "data", "gabarito", "gabarito.csv");
 
@@ -83,6 +86,11 @@ export async function calcularProva(): Promise<Prova> {
       bloqueados: ds.filter((d) => d.acao === "bloquear" || d.acao === "pedir_decisao").length,
       porCodigo: ds.filter((d) => d.decididoPor === "codigo").length,
       porIA: ds.filter((d) => d.decididoPor === "ia").length,
+    },
+    auditoria: {
+      amostrados: ds.filter((d) => d.auditoria).length,
+      questionados: ds.filter((d) => (d.auditoria?.risco ?? 0) >= LIMIAR_AUDITORIA).length,
+      limiar: LIMIAR_AUDITORIA,
     },
     revisor: await testarRevisor(gab.filter((c) => c.tipologia === "G16")),
     iaAtiva: iaDisponivel(),

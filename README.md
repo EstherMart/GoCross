@@ -1,4 +1,4 @@
-<p align="center"><img src="img/logo.jpg" alt="GoCross" width="360"></p>
+<p align="center"><img src="public/logo.jpg" alt="GoCross" width="420"></p>
 
 # GoCross
 
@@ -40,6 +40,7 @@ CSV (data/) → lib/dados + normalizar → lib/sinais (G01 G03 G04 G05, código)
 | Investigador | Níveis 1 e 2: coleta evidência e age |
 | Revisor adversário | Pergunta se a ação pode prejudicar pagamento legítimo e confere se o parecer só cita valores, NF e CNPJ que existem nos dados |
 | Despachante | Nível 3: dossiê, pedido de decisão, registro da resposta |
+| Auditor do limpo | Amostra fixa (1 a cada 20 títulos liberados) revisada pela IA. Só mede o risco de algo ter passado; não altera a decisão. Resultado na `/prova` |
 
 Chamadas de IA pelo [AI Proxy](https://ai-proxy.gogroupbr.com); a chave fica só em `AI_PROXY_API_KEY`.
 
