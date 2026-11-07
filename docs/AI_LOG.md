@@ -65,3 +65,12 @@ Formato de cada entrada:
   - Só o nome e a descrição ficam sempre carregados; o corpo da skill só entra quando chamada.
 - **Resultado (antes→depois):** [CONFIRMAR] sem medição de tokens por fase ainda; conferir o consumo real ao fim de cada fase e anotar aqui.
 - **Aprendizado:** modelo mais barato por padrão + sessão curta com handoff + regras de economia escritas valem mais do que otimizar prompt a prompt; falta medir.
+
+## [CONFIRMAR] Interface fora do padrão Gocase
+- **Tipo:** correção
+- **Pedi:** ajustar a interface, usar o nome GoCross e deixar o README amigável (modelo de README de hackathon).
+- **IA fez:** a tela inicial usava estilos soltos no próprio componente, sem identidade e sem seguir o padrão de interface do sistema Gocase.
+- **Como detectei:** revisão visual da tela do lote.
+- **Correção:** tema centralizado em app/globals.css (cabeçalho GoCross, cartões de resumo, tabela e selos de nível). Os valores de cor e fonte são provisórios: a IA não tem acesso ao design system da Gocase, então trocar pelos tokens oficiais é [CONFIRMAR].
+- **Resultado (antes→depois):** [CONFIRMAR] sem medição; só revisão visual.
+- **Aprendizado:** passar o design system real (tokens ou link) antes de pedir interface, para a IA não adivinhar o padrão.

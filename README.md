@@ -1,34 +1,84 @@
-# hackthonGo · GoHacks Talent 2026
+# GoCross
 
-Plano de estudo e execução para o hackathon individual (Fortaleza, 07 e 08/11).
+> Um colega digital que confere cada pagamento antes de a remessa fechar.
 
-- [Plano GoHacks Talent.html](Plano%20GoHacks%20Talent.html): plano em 8 páginas (essencial, prompts, MVP, setup e skills, entrega e pitch, tokens e riscos, meu projeto, Dia D). Abra no navegador.
+Projeto individual do **GoHacks Talent 2026** (Fortaleza, 07 e 08/11), desafio **Pagamentos**.
 
-## Setup inicial (ordem)
+## O problema
 
-1. Criar `.gitignore` (`.env*`, `node_modules/`, `.next/`, `.vercel/`, `.claude/settings.local.json`) **antes do primeiro commit**. O repositório é público.
-2. Prompt SETUP 1: gera `CLAUDE.md` (máx. 40 linhas), `REQUISITOS.md`, `AI_LOG.md` e as skills `ai-log` e `hack-handoff` (máx. 15 linhas cada).
-3. Depois de escolher o desafio: SETUP 2 (perfil dos dados) e SETUP 3 (esqueleto Next.js + rota de IA com validação, retry e `maxDuration`).
+Todo mês saem milhares de pagamentos. O cadastro é manual, em vários sistemas, e ninguém consegue conferir título a título. Hoje o lote é assinado quase sem checagem, e o dinheiro indevido (duplicidade, valor errado, troca de conta, boleto de outro CNPJ) sai junto.
 
-Os textos dos prompts estão na página 4 do plano, com botão de copiar.
+## A solução
 
-## Projeto: colega digital de contas a pagar (desafio Pagamentos)
+O GoCross percorre cada título do lote **antes** do fechamento da remessa e age:
 
-Confere cada título do lote antes do fechamento da remessa e age: libera, retira, bloqueia ou pede decisão a uma pessoa. Documentação em [docs/](docs/): [REQUISITOS.md](docs/REQUISITOS.md), [GABARITO.md](docs/GABARITO.md), [IDEIAS.md](docs/IDEIAS.md), [AI_LOG.md](docs/AI_LOG.md) e [HANDOFF.md](docs/HANDOFF.md) (estado da sessão).
+| Nível | O que é | O que o GoCross faz |
+|-------|---------|---------------------|
+| 1 · Baixo | Rotina, sem sinal de risco | Libera sozinho |
+| 2 · Médio | Erro provável (ex.: duplicidade, valor divergente) | Retira do lote e explica o motivo |
+| 3 · Crítico | Risco de fraude ou acima da alçada | Bloqueia e pede decisão a uma pessoa, com dossiê curto |
+
+Regras: o nível crítico vence, título não reconhecido não é liberado e pessoa só entra no nível 3.
+
+**Para quem:** a analista de contas a pagar que fecha a remessa. O GoCross assume a conferência repetitiva; ela decide as exceções.
+
+## Tipologias do MVP
+
+G01 duplicidade · G03 valor divergente da duplicata · G04 troca bancária sem confirmação · G05 boleto com CNPJ de outra raiz · G16 controles (casos que parecem erro mas são legítimos e não podem ser barrados).
+
+## Como funciona
+
+- Os CSV são processados **em código**. A IA entra só nos casos ambíguos, para decidir e escrever o parecer.
+- Um revisor independente checa se o parecer cita só valores, NF e CNPJ que existem nos dados.
+- Texto de e-mail, NF e WhatsApp é tratado como dado, nunca como instrução.
+
+## Stack
+
+Next.js 14 + TypeScript, publicado na Vercel. IA pelo AI Proxy (a chave fica só em variável de ambiente).
+
+## Como rodar
+
+Precisa de Node 20+.
+
+```bash
+npm install
+cp .env.example .env.local   # preencha AI_PROXY_API_KEY
+npm run dev                  # abre o lote RM20261103-MER
+npm run avaliar              # acerto por tipologia e placar em R$
+```
+
+Os dados ficam em `data/` e **não são versionados**. Coloque a pasta `pagamentos` lá antes de rodar.
+
+## Estrutura
 
 ```
-app/            página do lote (semáforo por nível) e rota /api/lote
-lib/dados.ts    leitura dos CSV de data/pagamentos
+app/               tela do lote e rota /api/lote
+lib/dados.ts       leitura dos CSV
 lib/normalizar.ts  CNPJ, raiz de CNPJ, número de NF
-lib/sinais/     detectores em código, por nível (1, 2, 3); G01–G16
-lib/niveis.ts   classificação (o crítico vence; não reconhecido não é liberado)
-lib/agente/     Investigador, Revisor, Despachante (IA só nos ambíguos)
-lib/remessa.ts  remessa filtrada e fila de decisões
-scripts/avaliar.ts  acerto por tipologia e placar em R$ sobre data/gabarito/gabarito.csv
+lib/sinais/        detectores em código, por nível
+lib/niveis.ts      classificação (o crítico vence)
+lib/agente/        IA nos casos ambíguos e revisor
+lib/remessa.ts     remessa filtrada e fila de decisões
+scripts/avaliar.ts acerto por tipologia sobre data/gabarito/gabarito.csv
+docs/              requisitos, gabarito, ideias, AI_LOG e handoff
 ```
 
-**Rodar** (precisa de Node, que não está instalado nesta máquina): `npm install`, depois `npm run dev` (abre o lote RM20261103-MER) e `npm run avaliar`. Chave de IA: copiar `.env.example` para `.env.local`.
+## Estado
 
-**Dados:** `data/` não é versionado (repositório público). Para publicar na Vercel é preciso decidir como levar os CSV [CONFIRMAR].
+Esqueleto de ponta a ponta com a nova interface. Os detectores e o agente de IA ainda estão sendo implementados, então hoje todo título sai como "liberar". O acompanhamento está em [docs/HANDOFF.md](docs/HANDOFF.md).
 
-**Estado:** esqueleto. Os detectores de `lib/sinais/` e o agente ainda são vazios; todo título hoje cai em "liberar" (nível 1, sem sinais), e o gabarito está sem casos.
+## Como usamos IA
+
+Cada correção feita à IA está registrada em [docs/AI_LOG.md](docs/AI_LOG.md), com o antes e o depois.
+
+## Documentação
+
+[Requisitos](docs/REQUISITOS.md) · [Gabarito](docs/GABARITO.md) · [Ideias](docs/IDEIAS.md) · [AI_LOG](docs/AI_LOG.md) · [Handoff](docs/HANDOFF.md)
+
+## Quem fez
+
+Luiza Martins · GoHacks Talent 2026
+
+Demo: [CONFIRMAR]
+
+Plano de estudo usado no evento: [Plano GoHacks Talent.html](Plano%20GoHacks%20Talent.html) (local, fora do GitHub).

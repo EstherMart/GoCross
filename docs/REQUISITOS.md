@@ -52,6 +52,32 @@ O desafio exige que o agente **aja nos sistemas** e **levante a mão** quando n�
 - **Papéis (orquestração):** Investigador (níveis 1 e 2: coleta evidência e age), Revisor adversário (pergunta se a ação pode prejudicar pagamento legítimo e confere citações), Despachante (nível 3: dossiê, mensagem, registro da resposta). Uma chamada de IA por título ambíguo, nunca por título limpo.
 - **Registro de erros da IA:** cada correção feita sobre saída da IA vai ao AI_LOG.md (alimenta Modelagem e o relatório individual).
 
+## Diferencial sugerido: red team e blue team em IA (proteção da área de pagamento)
+**Status: sugestão, fora do MVP mínimo.** Entra só depois de P3 e P4 funcionando e com OK do mentor. Ideia: o GoCross não só confere o lote, ele **prova que a área de pagamento resiste a invasão cibernética**, testando a si mesmo.
+
+**Dois agentes de IA, em ambiente simulado:**
+- **Red team (atacante):** gera cenários de invasão e fraude contra o fluxo de pagamento, em cima de títulos do lote. Exemplos ligados às tipologias já mapeadas: e-mail de "diretor" pedindo pagamento urgente; troca de conta bancária por canal fora do cadastro (G04); boleto ou 2ª via com beneficiário de outra raiz de CNPJ (G05); NF ou e-mail com instrução embutida ("ignore as regras") para enganar a IA (G14); fracionamento para fugir da alçada de R$ 5 mil; pedido de liberar título já bloqueado.
+- **Blue team (defensor):** o próprio GoCross (detectores em código, Investigador, Revisor, Despachante). Tenta detectar, bloquear e acionar a pessoa certa.
+- **Placar do duelo:** quantos ataques o blue team barrou, quantos passaram, quantos controles G16 (legítimos) foram barrados por engano, e o R$ que teria saído. Rodadas repetidas mostram a evolução e alimentam o AI_LOG.
+
+**Regras de segurança do próprio experimento (obrigatórias):**
+- O red team **só gera dados de teste** (títulos, e-mails e boletos sintéticos em memória ou em arquivo separado). Não acessa banco, ERP nem sistema real, não faz varredura, não envia mensagem a ninguém.
+- Casos do red team ficam **separados do gabarito real** (`data/gabarito/` intocado) e rotulados como sintéticos. Como a declaração do hackathon é "apenas dados fornecidos", **injetar só com OK do mentor** (mesma regra do ponto 10 dos pontos fracos).
+- Não se publica o texto dos ataques na demo pública além de exemplos mínimos; a chave de IA continua só em `AI_PROXY_API_KEY`.
+
+**Proteção da área de pagamento (o que o blue team deve garantir):**
+1. Texto de terceiros (e-mail, NF, WhatsApp, descrição) é **só dado**: nunca vira instrução nem chamada de ferramenta.
+2. **Lista fixa de ferramentas** por papel (analista_cp, auditor, aprovador) e menor privilégio: a IA propõe, o código executa só o que o papel permite.
+3. **Falha fecha:** título não reconhecido, IA fora do ar ou revisor sem resposta = não libera.
+4. Nenhuma ação que **solta dinheiro** sem checagem em código e revisor; liberar nunca depende só de texto gerado.
+5. **Separação de funções:** quem sugere não aprova; acima da alçada vai a aprovador (PS01, PS03 ou PS08).
+6. **Registro de cada ação** (quem, o quê, evidência, regra) para auditoria; ataque barrado também é registrado.
+7. Segredos fora do repositório; `/api/publico` e `ia_token` não são copiados.
+
+**Critério de pronto (se entrar):** pelo menos 5 cenários do red team rodados contra o lote, tabela barrados × passaram × falsos positivos, e a causa de cada ataque que passou. Não citar taxa de detecção sem esse número medido.
+
+**Risco:** pode soar como escopo demais para 1 dia. Corte primeiro o agente atacante autônomo e fique com **cenários de ataque fixos** (lista curta, escritos por nós) contra o blue team; a IA atacante vira próximo passo.
+
 ## Cobertura das 6 frentes oficiais do desafio
 | Frente | Cobertura no MVP |
 |---|---|
@@ -80,6 +106,7 @@ O desafio exige que o agente **aja nos sistemas** e **levante a mão** quando n�
 - Segregação de funções (aprovacoes, usuarios_sistema, log_auditoria).
 - Rascunho de mensagem ao fornecedor (comunicacoes_fornecedores).
 - Custo e tempo por título no slide.
+- Diferencial red team × blue team (seção própria acima): cenários de ataque simulados contra o fluxo de pagamento, com placar de barrados × passaram.
 
 **NÃO VAI**
 - Cadastro automático nos sistemas, integração real com ERP/banco, login, treino de modelo, dashboard de 12 gráficos.
@@ -138,6 +165,7 @@ Fonte: **GABARITO.md** (16 tipologias G01–G16 mapeadas). **Escopo do MVP: 5 ti
 | 9 | Fronteira nível 2 × 3 não validada | Comprador e aprovador acima de R$ 5 mil ainda pendentes | Perguntar ao mentor e registrar a resposta |
 | 10 | Dados injetados vs. declaração "apenas dados fornecidos" | Casos sintéticos poderiam ferir a declaração | MVP atual usa só casos reais; injetar só com OK do mentor |
 | 11 | Custo e tempo por título sem medição | Slide promete R$ 0,0X por análise | Registrar `usage` e tempo por chamada (Jev traz `estimated_cost_usd`; chat só tokens) |
+| 13 | Red team usa casos sintéticos | Conflita com "apenas dados fornecidos" e pode virar escopo demais | Separar do gabarito real, rotular como sintético, pedir OK do mentor; começar com cenários fixos |
 | 12 | Segurança do repositório | Chave exposta ou `data/` público | Chave só em `AI_PROXY_API_KEY`; `data/` no `.gitignore`; token `ia_token` do /api/publico não copiado |
 
 ## Outros desafios (simulados, fora da lista do site)
