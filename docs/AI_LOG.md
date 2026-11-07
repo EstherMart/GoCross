@@ -93,7 +93,7 @@ Formato de cada entrada:
 - **Resultado (antes→depois):** IA de 0 chamadas para 76 chamadas (US$ 0,000987); títulos por IA de 0 para 21 de 876; revisor de "não rodado" para 3/3 ações plantadas derrubadas.
 - **Aprendizado:** conferir a saída do script depois de configurar a chave, não só o arquivo.
 
-## [CONFIRMAR] Críticas da banca: humano também erra, júri de agentes e orquestração visível
+## [CONFIRMAR] Humano também erra, júri de agentes e orquestração visível
 - **Tipo:** mudança de rota
 - **Pedi:** responder às críticas: IA como juiz com vários agentes (inclusive um "chato"), comparar erro da IA com erro humano, e a tela parecer dashboard em vez de orquestração.
 - **IA fez:** mediu o histórico com os detectores atuais e propôs júri (promotor, defensor, juiz) com citação verificada, trava "IA nunca rebaixa crítico" e visão de orquestração no lote.
@@ -101,3 +101,9 @@ Formato de cada entrada:
 - **Correção:** aprovado seguir com 4 passos: comparação humana em METRICAS, júri no lugar do revisor, visão de orquestração, nova medição. Restam 1h30.
 - **Resultado (antes→depois):** histórico: 100 títulos pagos com sinal (R$ 703 mil), 35 com aprovação humana explícita (sinal, não erro confirmado).
 - **Aprendizado:** defender a IA como apoio que tira a rotina do humano, não como substituta dele nos críticos.
+
+## [CONFIRMAR] Críticos sem humano e orquestração em trilhas
+- **Tipo:** correção
+- **Pedi / IA fez / Como detectei / Correção:** pedi menos poluição e orquestração clara / IA manteve crítico esperando pessoa ("Pessoa decide", botões simulados) e trilhas com replay difícil de ler / revisando a tela / crítico vira bloqueio final do agente com dossiê registrado; home e lote mostram trilhas por risco (Triagem → Auditor IA | Investigador → Promotor × Defensor → Juiz | Despachante).
+- **Resultado (antes→depois):** [CONFIRMAR]
+- **Aprendizado:** a autonomia precisa aparecer na tela; mostrar os agentes por papel, não o resultado por título.

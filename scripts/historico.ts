@@ -1,6 +1,5 @@
 import { carregar } from "../lib/dados";
 import { coletarSinais } from "../lib/sinais/index";
-// Histórico: títulos que humanos deixaram pagar (retorno 00) e que nossos detectores sinalizariam.
 const pagos = new Map(carregar("retorno_remessa.csv").filter(r => r.codigo_ocorrencia === "00").map(r => [r.titulo_id, r]));
 const aprov = new Map<string, string[]>();
 for (const a of carregar("aprovacoes.csv")) aprov.set(a.titulo_id, [...(aprov.get(a.titulo_id) ?? []), a.decisao]);

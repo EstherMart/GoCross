@@ -44,15 +44,23 @@ Ressalvas: sinal não é erro confirmado (precisão no histórico não medida). 
 | Tempo dos 17 lotes | 113 s | 156 s; lote mais lento 45 s (RM20261103-MER) |
 | Falhas do proxy | não medido | 5 em 190 na avaliação (uma nova tentativa; falha mantém a decisão do código); 0 no medir |
 
-## Modo sombra: júri nos críticos (`npx tsx --env-file-if-exists=.env.local scripts/sombra.ts`)
-O júri julgou os 4 críticos do gabarito como se pudesse decidir, sem mudar nada.
+## Críticos: agente × júri × humano (`npx tsx --env-file-if-exists=.env.local scripts/sombra.ts`)
+Modo sombra: o júri julga críticos (G04/G05) e controles legítimos (G16) como se pudesse decidir, sem mudar nada.
 
-| Cenário | Tipologia | Esperado | Júri |
+| Cenário | Tipologia | Esperado | Agente (produção) | Júri (sombra) |
+|---|---|---|---|---|
+| C08 | G04 | bloquear | bloqueado | pessoa (juiz inseguro, 58%) |
+| C09 | G04 | bloquear | bloqueado | pessoa (juiz inseguro, 43%) |
+| C10 | G04 | bloquear | bloqueado | segura (60%) |
+| C11 | G05 | bloquear | bloqueado | segura (83%) |
+| C12–C16 | G16 | liberar | liberado (5/5) | pessoa (acusação sem prova verificável, 5/5) |
+
+| Métrica | Agente (produção) | Júri (sombra) | Humano (histórico) |
 |---|---|---|---|
-| C08 | G04 | bloquear | pessoa (juiz inseguro, 56%) |
-| C09 | G04 | bloquear | pessoa (juiz inseguro, 58%) |
-| C10 | G04 | bloquear | segura (66%) |
-| C11 | G05 | bloquear | segura (79%) |
+| Fraude liberada | 0/4 | 0/4 | 3 títulos G04 pagos com troca sem confirmação (R$ 14.382), 1 com aprovação explícita |
+| Legítimo bloqueado | 0/5 | 0/5 retido sem pessoa (5/5 escalados) | não medido (histórico não registra bloqueios) |
+| Bloqueados | 4/9 (só os críticos) | 7/9 | nenhum bloqueio registrado (tesoureiro assina o lote sem conferir) |
 
-Nenhuma fraude liberada (0/4); todas as provas citadas eram evidências reais. Amostra de 4: não sustenta taxa de erro.
-Comparação humana (histórico): 3 títulos G04 pagos com troca sem confirmação, 1 com aprovação humana explícita.
+Leitura: o júri nunca libera, mas sozinho bloquearia os 5 controles legítimos (acusação sem prova). Por isso o crítico é bloqueado pelo código e o júri atua só nos ambíguos.
+Decisão de 07/11: o agente fecha o crítico sozinho (bloqueia e registra o dossiê); nenhum passo espera uma pessoa.
+Ressalvas: amostra de 4 fraudes e 5 controles, sem taxa de erro; pago com sinal no histórico não é fraude confirmada.

@@ -1,30 +1,31 @@
 # HANDOFF
 
 ## Objetivo
-GoCross: triagem de títulos antes do fechamento da remessa (libera, retira, bloqueia; pessoa só no crítico). Desafio "Pagamentos". Fatia: G01, G03, G04, G05 + controles G16. Congelar 15h, enviar 16h15. Demo no localhost (mentor liberou; dados fictícios, sem Vercel).
+GoCross: triagem de títulos antes do fechamento da remessa; o agente decide sozinho (libera, retira, bloqueia). Desafio "Pagamentos". Fatia: G01, G03, G04, G05 + controles G16. Congelar 15h, enviar 16h15 (o site do evento diz 16h30). Demo no localhost (mentor liberou; dados fictícios, sem Vercel).
 
 ## Funciona
-- Júri (promotor × defensor × juiz) no lugar do revisor: prova é escolha fechada entre evidências reais; IA nunca libera nem rebaixa. Gabarito 16/16, 0 FP, 3/3 plantadas. 829/21/26 (lib/ret/pessoa), US$ 0,0023/semana, 156 s nos 17 lotes (máx 45 s).
-- Proxy com uma nova tentativa e contagem de falhas (5/190 na avaliação). Clean code parcial; tsc passa.
-- Lote: faixa de KPIs + abas "Agentes trabalhando" (padrão, orquestração em trilhas + replay), Exceções, Remessa final. Logo só com o nome.
-- Métricas em docs/METRICAS.md: base, linha humana do histórico (100 pagos com sinal, R$ 703 mil, 35 aprovados), júri antes/depois, modo sombra nos críticos (0/4 fraudes liberadas).
+- Júri (promotor × defensor × juiz) nos ambíguos; IA nunca libera. Gabarito 16/16, 0 FP, 3/3 plantadas. tsc passa.
+- Crítico: o agente bloqueia e registra o dossiê; sem botões nem "pessoa decide".
+- Home: bloco azul com grafo de agentes + terminal; "Rodar conferência" toca 7 títulos reais via /api/conferir. Lote: mesmo grafo, exceções em linhas com dossiê, remessa final com CSV.
+- Tema do brandbook Gogroup (azul #2659a5, lima #d7d900, Poppins). Home só por código (~0,7 s).
+- docs/METRICAS.md: tabela agente × júri × humano nos críticos (0/4 fraude liberada; júri sozinho bloquearia 5/5 controles).
 
 ## Quebrado / falta
-- Pedido em aberto da usuária: orquestração ainda difícil de ler; melhorar o fluxo visual sem deixar de ser MVP. Aba Agentes e replay não conferidos no navegador.
-- Pedido em aberto: comparação agente × humano nos críticos nas métricas (taxa de fraude liberada e legítimo bloqueado; hoje só 4 casos + histórico).
+- Telas novas NÃO conferidas no navegador (grafo, animação, tema). Tela /prova ainda no layout antigo.
 - Tempo da analista não medido. Red team sintético (30 a 50 críticos) é próximo passo declarado.
-- Arquivos sem commit desde antes: lib/csv.ts, lib/dados.ts, lib/normalizar.ts, tsconfig.json, package-lock.json, img/.
+- Falta submissão: slides PDF (até 10), formulário, GIFs, pitch (5 min + 5 de sabatina).
 
 ## Decisões
-- Agente bloqueia sozinho no crítico; aprovar crítico continua humano (politicas.csv exige aprovação dupla em troca bancária) e falta base maior.
-- Defesa: "funciona para este recorte e medimos o que sabemos"; retido ≠ perda evitada.
+- Crítico é bloqueado pelo código; o júri só atua nos ambíguos (sozinho bloquearia legítimos sem prova).
+- Defesa: "funciona para este recorte e medimos o que sabemos"; retido ≠ perda evitada. IA só onde há dúvida.
 
 ## Armadilhas
-- Node fora do PATH: $env:Path += ";C:\Program Files\nodejs". Dev aberto em :3010; fechar antes de build (senão apagar .next).
+- Node fora do PATH: $env:Path += ";C:\Program Files\nodejs". Dev em :3010; fechar antes de build (senão apagar .next).
 - Não abrir /api/publico (expõe ia_token). Lote com IA demora até 45 s: abrir antes da demo.
+- Brandbook: link do Google não abre; usei o .pptx em Downloads (paleta e Poppins).
 
 ## Próxima ação
-1) Melhorar leitura da orquestração (fluxo único e simples). 2) Tabela agente × humano nos críticos em METRICAS. 3) Conferir telas no navegador. 4) Congelar, GIFs (ScreenToGif), pitch.
+1) Conferir home e lote no navegador e ajustar. 2) Slides, GIFs (ScreenToGif), pitch e sabatina. 3) Congelar às 15h e submeter.
 
 ## Arquivos-chave
-lib/agente/index.ts, lib/ia.ts, lib/motor.ts, lib/prova.ts, app/lote/[id]/{page,AbasLote,Orquestracao,FilaTitulos}.tsx, app/globals.css, scripts/{avaliar,medir,historico,sombra}.ts, docs/METRICAS.md
+app/{page,Orquestracao,globals.css}, app/lote/[id]/{page,Excecao,BaixarCsv}.tsx, app/api/conferir/route.ts, lib/{remessa,motor,formato}.ts, lib/agente/index.ts, scripts/{avaliar,medir,sombra}.ts, docs/METRICAS.md

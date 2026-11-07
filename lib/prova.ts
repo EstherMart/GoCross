@@ -7,7 +7,6 @@ import { iaDisponivel } from "./ia";
 import { decidir } from "./motor";
 import type { Decisao, Linha } from "./tipos";
 
-// Tudo que a aba "Prova" mostra é calculado aqui, da execução real. Nada digitado à mão.
 export type CasoProva = { cenario: string; titulo: string; tipologia: string; grupo: string; origem: string; esperado: string; obtido: string; ok: boolean; valorRisco: number };
 
 export type Prova = {

@@ -7,10 +7,10 @@ export type Acao = "liberar" | "retirar" | "bloquear" | "pedir_decisao";
 export type Linha = Record<string, string>;
 
 export type Sinal = {
-  tipologia: string; // ex.: "G01" (ver GABARITO.md)
+  tipologia: string;
   nivel: Nivel;
-  regra: string; // regra citada (politicas.csv)
-  evidencia: string; // citação que deve existir nos dados
+  regra: string;
+  evidencia: string;
 };
 
 export type Passo = {
@@ -31,6 +31,6 @@ export type Decisao = {
   tipologias: string[];
   rastro: Passo[];
   decididoPor: "codigo" | "ia"; // "ia" quando a IA confirmou ou mudou uma decisão ambígua
-  pedido?: Pedido; // só no nível 3: a pessoa é acionada
+  pedido?: Pedido;
   auditoria?: { risco: number }; // amostra de títulos limpos: risco de ter passado algo (0 a 1); só mede, não muda a decisão
 };

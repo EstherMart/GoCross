@@ -38,7 +38,7 @@ export async function investigar(t: Linha, d: Decisao): Promise<Decisao> {
 }
 
 // Anti-alucinação: a prova é escolha fechada entre as evidências do código; "nenhuma" invalida a acusação.
-// A IA nunca libera nem rebaixa: sem prova, juiz inseguro ou pedido de liberação vão para uma pessoa.
+// A IA nunca libera nem rebaixa: sem prova, juiz inseguro ou pedido de liberação viram bloqueio.
 const CONFIANCA_MIN = 0.6;
 
 function provas(evidencias: string[]) {
@@ -82,7 +82,7 @@ export async function julgar(t: Linha, d: Decisao): Promise<Decisao> {
   );
   const v = String(j?.answers?.veredito?.choice ?? "");
   const conf = Number(j?.answers?.veredito?.confidence ?? 0);
-  const pessoa = (motivo: string): Decisao => ({ ...com(x, { agente: "Juiz", origem: "ia", texto: `${motivo}: escala para uma pessoa (nível 3).` }), nivel: 3, acao: "bloquear", decididoPor: "ia" });
+  const pessoa = (motivo: string): Decisao => ({ ...com(x, { agente: "Juiz", origem: "ia", texto: `${motivo}: bloqueia o título (nível 3).` }), nivel: 3, acao: "bloquear", decididoPor: "ia" });
 
   if (!provaValida) return pessoa("Acusação sem prova verificável");
   if (!v || conf < CONFIANCA_MIN) return pessoa(`Juiz inseguro (${pct(conf)})`);
@@ -112,7 +112,7 @@ export function despachar(t: Linha, d: Decisao): Decisao {
   if (d.nivel !== 3) return d;
   const fraude = d.tipologias.some((x) => x === "G04" || x === "G05");
   const para = fraude ? "PS08" : Number(t.valor) > 50_000 ? "PS03" : "PS01";
-  const mensagem = `Título ${t.titulo_id} (R$ ${t.valor}) bloqueado e fora da remessa. ${d.evidencias.join(" · ") || d.motivo}. Libera ou segura?`;
+  const mensagem = `Título ${t.titulo_id} (R$ ${t.valor}) bloqueado e fora da remessa. ${d.evidencias.join(" · ") || d.motivo}.`;
   const pedido: Pedido = { para, nome: PESSOAS[para as keyof typeof PESSOAS], mensagem, canal: "simulado" };
-  return { ...com(d, { agente: "Despachante", origem: "codigo", texto: `Dossiê montado e pedido enviado a ${pedido.nome} (canal simulado).` }), pedido };
+  return { ...com(d, { agente: "Despachante", origem: "codigo", texto: `Bloqueado fora da remessa; dossiê enviado a ${pedido.nome} para registro (canal simulado).` }), pedido };
 }

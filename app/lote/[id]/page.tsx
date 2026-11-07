@@ -1,37 +1,54 @@
 import Link from "next/link";
-import { processarLote, type ResultadoLote } from "@/lib/remessa";
+import { casoDe, processarLote } from "@/lib/remessa";
 import { brl } from "@/lib/formato";
 import { iaDisponivel } from "@/lib/ia";
-import { AbasLote } from "./AbasLote";
+import { Orquestracao } from "../../Orquestracao";
+import { BaixarCsv } from "./BaixarCsv";
+import { Excecao } from "./Excecao";
 
 export const dynamic = "force-dynamic";
 
-function Faixa({ r }: { r: ResultadoLote }) {
-  return (
-    <section className="sec" aria-label="Diagnóstico do lote">
-      <div className="kpis">
-        <div className="kpi"><div className="n">{r.decisoes.length}</div><div className="l">Conferidos ({brl(r.valorTotal)})</div></div>
-        <div className="kpi ok"><div className="n">{r.remessa.length}</div><div className="l">Seguem na remessa ({brl(r.valorRemessa)})</div></div>
-        <div className="kpi warn"><div className="n">{r.retirados.length}</div><div className="l">Retirados com evidência</div></div>
-        <div className="kpi crit"><div className="n">{r.bloqueados.length}</div><div className="l">Pessoa acionada</div></div>
-      </div>
-      <p className="foot">
-        {r.porCodigo} decididos por código e {r.porIA} com apoio da IA · {brl(r.valorRetido)} retidos antes do fechamento · canal de acionamento simulado.
-        {!iaDisponivel() && " IA desligada (sem AI_PROXY_API_KEY): os ambíguos seguem retirados, nunca liberados."}
-      </p>
-    </section>
-  );
-}
-
 export default async function Page({ params }: { params: { id: string } }) {
   const r = await processarLote(params.id);
+  const casosDoLote = [...r.excecoes.slice(0, 6), ...r.liberados.filter((d) => d.auditoria).slice(0, 1)].map(casoDe);
+
   return (
     <main className="container">
-      <p className="foot"><Link href="/">← Remessas</Link></p>
+      <p className="foot voltar"><Link href="/">← Remessas da semana</Link></p>
       <h1>Lote {r.lote}</h1>
-      <p className="lede">{r.banco} · data {r.dataPrevista} · fecha às {r.fechamento}</p>
-      <Faixa r={r} />
-      <AbasLote decisoes={r.decisoes} />
+      <p className="lede">{r.banco} · {r.dataPrevista} · fecha às {r.fechamento}</p>
+      {!iaDisponivel() && <p className="msg">IA desligada (sem AI_PROXY_API_KEY): os ambíguos seguem retirados, nunca liberados.</p>}
+
+      <Orquestracao fluxo={r.fluxo} casos={casosDoLote} titulo="Agentes · lote" />
+
+      <section className="card sec">
+        <div className="card-h">Fora da remessa · {r.excecoes.length} títulos · {brl(r.valorRetido)}</div>
+        {r.excecoes.length === 0 ? (
+          <div className="empty">Nenhuma exceção: o lote segue inteiro.</div>
+        ) : (
+          r.excecoes.map((d) => <Excecao key={d.tituloId} d={d} />)
+        )}
+      </section>
+
+      <section className="card sec">
+        <div className="card-h remessa-h">
+          <span>Remessa final · {r.liberados.length} títulos · {brl(r.valorRemessa)}</span>
+          <BaixarCsv liberados={r.liberados} lote={r.lote} />
+        </div>
+        <details className="lista">
+          <summary className="pad">Ver os {r.liberados.length} títulos</summary>
+          <div className="scroll remessa-lista">
+            <table>
+              <thead><tr><th>Título</th><th>Fornecedor</th><th className="num">Valor</th></tr></thead>
+              <tbody>
+                {r.liberados.map((d) => (
+                  <tr key={d.tituloId}><td>{d.tituloId}</td><td>{d.fornecedor}</td><td className="num">{brl(d.valor)}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
     </main>
   );
 }

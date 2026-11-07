@@ -2,7 +2,6 @@ import { carregar, agenda } from "./dados";
 import { cnpjRaiz, nfNormalizada } from "./normalizar";
 import type { Linha } from "./tipos";
 
-// Índices em memória sobre os CSV (montados uma vez por processo).
 type Indices = {
   fornecedor: Map<string, Linha>;
   alteracoes: Map<string, Linha[]>;

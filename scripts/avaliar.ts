@@ -1,8 +1,6 @@
 import { calcularProva } from "../lib/prova";
 import { usoTotal } from "../lib/ia";
 
-// Roda o motor sobre data/gabarito/gabarito.csv (ver GABARITO.md): acerto por tipologia e por grupo
-// (ajuste x validação), o que passou, placar em R$ e custo. A tela /prova usa a mesma função.
 async function main() {
 const p = await calcularProva();
 if (p.casos.length === 0) { console.log("Sem data/gabarito/gabarito.csv."); return; }
