@@ -33,7 +33,6 @@ export function listarLotes(): ResumoLote[] {
   return [...m.values()].sort((a, b) => a.dataPrevista.localeCompare(b.dataPrevista) || a.fechamento.localeCompare(b.fechamento));
 }
 
-// Saída 1: remessa filtrada. Saída 2: títulos retidos, os críticos com pedido de decisão à pessoa certa.
 export async function processarLote(lote: string): Promise<ResultadoLote> {
   const titulos = agenda().filter((t) => t.lote_remessa === lote);
   const decisoes: DecisaoLote[] = [];

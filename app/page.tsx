@@ -4,7 +4,6 @@ import { brl } from "@/lib/formato";
 
 export const dynamic = "force-dynamic";
 
-// Tela 1: fila de remessas. Cada lote fecha num horário; o agente confere tudo antes disso.
 export default function Page() {
   const lotes = listarLotes();
   return (

@@ -25,7 +25,6 @@ export function FilaTitulos({ decisoes }: { decisoes: DecisaoLote[] }) {
   const termo = busca.trim().toLowerCase();
 
   const visiveis = useMemo(() => decisoes.filter((d) => casaBusca(d, termo)), [decisoes, termo]);
-  const liberados = visiveis.filter((d) => grupoDe(d.acao) === "liberado");
 
   return (
     <>
@@ -56,8 +55,6 @@ export function FilaTitulos({ decisoes }: { decisoes: DecisaoLote[] }) {
           </section>
         );
       })}
-
-      <RemessaFinal liberados={liberados} />
     </>
   );
 }
@@ -71,7 +68,7 @@ function baixarCsv(liberados: DecisaoLote[]) {
   URL.revokeObjectURL(link.href);
 }
 
-function RemessaFinal({ liberados }: { liberados: DecisaoLote[] }) {
+export function RemessaFinal({ liberados }: { liberados: DecisaoLote[] }) {
   const total = liberados.reduce((s, d) => s + d.valor, 0);
   return (
     <section className="card sec">

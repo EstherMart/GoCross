@@ -3,7 +3,6 @@ import { cnpjRaiz, nfNormalizada } from "../normalizar";
 import type { Linha, Sinal } from "../tipos";
 
 // Cada sinal é uma função pura em código (barato e exato). A IA não entra aqui.
-// Tipologias e colunas: ver GABARITO.md.
 export type Detector = (titulo: Linha) => Sinal[];
 
 const DIA = 86_400_000;

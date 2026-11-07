@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { parseCsv } from "./csv";
 import { tituloPorId, agenda } from "./dados";
-import { revisar } from "./agente";
+import { julgar } from "./agente";
 import { iaDisponivel } from "./ia";
 import { decidir } from "./motor";
 import type { Decisao, Linha } from "./tipos";
@@ -32,7 +32,7 @@ export function lerGabarito(): Linha[] {
   return existsSync(arq()) ? parseCsv(readFileSync(arq(), "utf8")) : [];
 }
 
-// Revisor adversário: planta 3 ações erradas (retirar um controle G16 legítimo) e conta quantas ele derruba.
+// Júri: planta 3 ações erradas (retirar um controle G16 legítimo) e conta quantas ele derruba.
 async function testarRevisor(controles: Linha[]) {
   if (!iaDisponivel()) return { rodado: false, plantadas: 0, derrubou: 0 };
   const alvos = controles.slice(0, 3);
@@ -44,7 +44,7 @@ async function testarRevisor(controles: Linha[]) {
       tituloId: c.titulo_id, nivel: 2, acao: "retirar", regra: "plantada", motivo: "G01", tipologias: ["G01"], decididoPor: "codigo", rastro: [],
       evidencias: [`Ação plantada: retirar o título ${c.titulo_id}, sem evidência real de erro`],
     };
-    const r = await revisar(t, errada);
+    const r = await julgar(t, errada);
     if (r.nivel === 3) derrubou++;
   }
   return { rodado: true, plantadas: alvos.length, derrubou };

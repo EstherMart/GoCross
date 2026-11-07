@@ -1,31 +1,30 @@
 # HANDOFF
 
 ## Objetivo
-GoCross: triagem de títulos antes do fechamento da remessa (libera, retira, bloqueia; pessoa só no crítico). Desafio "Pagamentos". Fatia: G01, G03, G04, G05 + controles G16. Congelar 15h, enviar 16h15 (submissão diz 16:30: confirmar).
+GoCross: triagem de títulos antes do fechamento da remessa (libera, retira, bloqueia; pessoa só no crítico). Desafio "Pagamentos". Fatia: G01, G03, G04, G05 + controles G16. Congelar 15h, enviar 16h15. Demo no localhost (mentor liberou; dados fictícios, sem Vercel).
 
 ## Funciona
-- Gabarito 16/16 (ajustado nos mesmos casos, não é taxa de detecção), 0 FP, revisor 3/3. IA: ~118 chamadas, US$ 0,0017.
-- Métricas reais (scripts/medir.ts): 876 títulos/17 lotes; 829 liberados (94,6%), 21 retirados, 26 acionam pessoa (1,5/lote, máx 6 em RM20261112-MER); R$ 461.391,78 retido; 113 s tudo, até 24 s por lote com IA.
-- Logo só com o nome: public/logo-nome.png (topbar e README). Não conferida no navegador.
+- Júri (promotor × defensor × juiz) no lugar do revisor: prova é escolha fechada entre evidências reais; IA nunca libera nem rebaixa. Gabarito 16/16, 0 FP, 3/3 plantadas. 829/21/26 (lib/ret/pessoa), US$ 0,0023/semana, 156 s nos 17 lotes (máx 45 s).
+- Proxy com uma nova tentativa e contagem de falhas (5/190 na avaliação). Clean code parcial; tsc passa.
+- Lote: faixa de KPIs + abas "Agentes trabalhando" (padrão, orquestração em trilhas + replay), Exceções, Remessa final. Logo só com o nome.
+- Métricas em docs/METRICAS.md: base, linha humana do histórico (100 pagos com sinal, R$ 703 mil, 35 aprovados), júri antes/depois, modo sombra nos críticos (0/4 fraudes liberadas).
 
 ## Quebrado / falta
-- Tela do lote não mostra a "Prova" nem métricas. Plano proposto, aguardando OK: bloco Prova + métricas no lote, limites lidos do politicas.csv, rodar tsc e gabarito.
-- Limites fixos no código (30 dias, ±0,10, 2%+1%, R$ 50 mil): regra nova exige código. politicas.csv tem regras não cobertas (aprovação dupla, fracionamento, segregação, sem NF/OC, antecipação, alçadas).
-- Tempo da analista não medido: cronometrar 10 títulos manuais (t); antes 52×t por lote, depois ~2,8 exceções.
-- Red team, investigador com ferramentas, canal real: fora. Vercel sem CSV (data/ no .gitignore): demo em localhost.
+- Pedido em aberto da usuária: orquestração ainda difícil de ler; melhorar o fluxo visual sem deixar de ser MVP. Aba Agentes e replay não conferidos no navegador.
+- Pedido em aberto: comparação agente × humano nos críticos nas métricas (taxa de fraude liberada e legítimo bloqueado; hoje só 4 casos + histórico).
+- Tempo da analista não medido. Red team sintético (30 a 50 críticos) é próximo passo declarado.
+- Arquivos sem commit desde antes: lib/csv.ts, lib/dados.ts, lib/normalizar.ts, tsconfig.json, package-lock.json, img/.
 
 ## Decisões
-- Três níveis; crítico vence; falha fechada; IA só no ambíguo. PS08 G04/G05, PS03 > R$ 50 mil, PS01 resto. Canal simulado.
-- Defesa: "funciona para este recorte e medimos o que sabemos"; resto como próximo passo. Retido ≠ perda evitada.
-- Demo: abas pré-abertas (lote demora até 24 s), GIFs (ScreenToGif) como plano B.
+- Agente bloqueia sozinho no crítico; aprovar crítico continua humano (politicas.csv exige aprovação dupla em troca bancária) e falta base maior.
+- Defesa: "funciona para este recorte e medimos o que sabemos"; retido ≠ perda evitada.
 
 ## Armadilhas
-- Node fora do PATH: $env:Path += ";C:\Program Files\nodejs". Build com dev aberto quebra: apagar .next.
-- Não abrir /api/publico (expõe ia_token).
-- Ainda sem commit: lib/csv.ts, lib/dados.ts, lib/normalizar.ts, tsconfig.json, package-lock.json, img/ (build do repo não fecha sem eles).
+- Node fora do PATH: $env:Path += ";C:\Program Files\nodejs". Dev aberto em :3010; fechar antes de build (senão apagar .next).
+- Não abrir /api/publico (expõe ia_token). Lote com IA demora até 45 s: abrir antes da demo.
 
 ## Próxima ação
-1) OK do plano da Prova no lote + limites do politicas.csv. 2) Commitar pendentes e testar checklist no localhost. 3) Medir tempo da analista. 4) Gravar GIFs e montar slides.
+1) Melhorar leitura da orquestração (fluxo único e simples). 2) Tabela agente × humano nos críticos em METRICAS. 3) Conferir telas no navegador. 4) Congelar, GIFs (ScreenToGif), pitch.
 
 ## Arquivos-chave
-lib/sinais/index.ts, lib/agente/index.ts, lib/prova.ts, lib/remessa.ts, app/lote/[id]/page.tsx, app/globals.css, scripts/avaliar.ts, scripts/medir.ts, README.md
+lib/agente/index.ts, lib/ia.ts, lib/motor.ts, lib/prova.ts, app/lote/[id]/{page,AbasLote,Orquestracao,FilaTitulos}.tsx, app/globals.css, scripts/{avaliar,medir,historico,sombra}.ts, docs/METRICAS.md

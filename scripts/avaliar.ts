@@ -12,7 +12,7 @@ console.log(`Falsos positivos G16: ${p.falsosPositivos}`);
 console.log(`Placar: -R$ ${Math.abs(p.placar).toFixed(2)}`);
 for (const c of p.passaram) console.log(`  errou ${c.cenario} ${c.tipologia}: esperado ${c.esperado}, obtido ${c.obtido}`);
 console.log(`Agenda: ${p.agenda.titulos} títulos; código ${p.agenda.porCodigo}, IA ${p.agenda.porIA}`);
-console.log(p.revisor.rodado ? `Revisor: derrubou ${p.revisor.derrubou}/${p.revisor.plantadas} ações plantadas` : "Revisor: não rodado (sem AI_PROXY_API_KEY)");
-console.log(`IA: ${usoTotal.chamadas} chamadas, ${usoTotal.tokensEntrada}+${usoTotal.tokensSaida} tok, US$ ${usoTotal.usd.toFixed(6)}, ${usoTotal.ms} ms`);
+console.log(p.revisor.rodado ? `Júri: derrubou ${p.revisor.derrubou}/${p.revisor.plantadas} ações plantadas` : "Júri: não rodado (sem AI_PROXY_API_KEY)");
+console.log(`IA: ${usoTotal.chamadas} chamadas, ${usoTotal.tokensEntrada}+${usoTotal.tokensSaida} tok, US$ ${usoTotal.usd.toFixed(6)}, ${usoTotal.ms} ms, ${usoTotal.falhas} falhas`);
 }
 main();

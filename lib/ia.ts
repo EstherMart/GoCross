@@ -1,12 +1,18 @@
 // Cliente do AI Proxy. Chave só em AI_PROXY_API_KEY (nunca versionada). Sem chave: devolve null e o motor falha fechado.
 const BASE = "https://ai-proxy.gogroupbr.com/v1";
 
-export type Uso = { chamadas: number; tokensEntrada: number; tokensSaida: number; usd: number; ms: number };
-export const usoTotal: Uso = { chamadas: 0, tokensEntrada: 0, tokensSaida: 0, usd: 0, ms: 0 };
+export type Uso = { chamadas: number; tokensEntrada: number; tokensSaida: number; usd: number; ms: number; falhas: number };
+export const usoTotal: Uso = { chamadas: 0, tokensEntrada: 0, tokensSaida: 0, usd: 0, ms: 0, falhas: 0 };
 
 export const iaDisponivel = () => Boolean(process.env.AI_PROXY_API_KEY);
 
 async function post(rota: string, corpo: unknown): Promise<any | null> {
+  const r = (await tentar(rota, corpo)) ?? (await tentar(rota, corpo));
+  if (!r) usoTotal.falhas++;
+  return r;
+}
+
+async function tentar(rota: string, corpo: unknown): Promise<any | null> {
   const chave = process.env.AI_PROXY_API_KEY;
   if (!chave) return null;
   const t0 = Date.now();

@@ -92,3 +92,12 @@ Formato de cada entrada:
 - **Correção:** script passou a usar `--env-file-if-exists=.env.local`.
 - **Resultado (antes→depois):** IA de 0 chamadas para 76 chamadas (US$ 0,000987); títulos por IA de 0 para 21 de 876; revisor de "não rodado" para 3/3 ações plantadas derrubadas.
 - **Aprendizado:** conferir a saída do script depois de configurar a chave, não só o arquivo.
+
+## [CONFIRMAR] Críticas da banca: humano também erra, júri de agentes e orquestração visível
+- **Tipo:** mudança de rota
+- **Pedi:** responder às críticas: IA como juiz com vários agentes (inclusive um "chato"), comparar erro da IA com erro humano, e a tela parecer dashboard em vez de orquestração.
+- **IA fez:** mediu o histórico com os detectores atuais e propôs júri (promotor, defensor, juiz) com citação verificada, trava "IA nunca rebaixa crítico" e visão de orquestração no lote.
+- **Como detectei:** crítica externa; a tela mostrava só resultado, não o processo.
+- **Correção:** aprovado seguir com 4 passos: comparação humana em METRICAS, júri no lugar do revisor, visão de orquestração, nova medição. Restam 1h30.
+- **Resultado (antes→depois):** histórico: 100 títulos pagos com sinal (R$ 703 mil), 35 com aprovação humana explícita (sinal, não erro confirmado).
+- **Aprendizado:** defender a IA como apoio que tira a rotina do humano, não como substituta dele nos críticos.

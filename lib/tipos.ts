@@ -13,9 +13,8 @@ export type Sinal = {
   evidencia: string; // citação que deve existir nos dados
 };
 
-// Passo do rastro: quem (agente) fez o quê, por código ou IA.
 export type Passo = {
-  agente: "Código" | "Investigador" | "Revisor" | "Despachante";
+  agente: "Código" | "Investigador" | "Promotor" | "Defensor" | "Juiz" | "Auditor" | "Despachante";
   origem: "codigo" | "ia";
   texto: string;
 };

@@ -5,7 +5,6 @@ import { AUDITORIA_1_EM } from "@/lib/agente";
 
 export const dynamic = "force-dynamic";
 
-// Tela 3: prova. Tudo calculado da execução real; o que não foi medido aparece como "não medido".
 export default async function Page() {
   const p = await calcularProva();
   const g05 = p.porTipologia.find((t) => t.tipologia === "G05");
@@ -52,7 +51,7 @@ export default async function Page() {
             Decididos só por código: <strong>{p.agenda.porCodigo}</strong>. Com a IA: <strong>{p.agenda.porIA}</strong>.
             {p.iaAtiva ? "" : " IA desligada nesta execução (sem AI_PROXY_API_KEY): zero chamadas."}
           </p>
-          <p className="foot">Detectores de duplicidade, valor × duplicata, troca bancária e boleto são código. A IA lê só os ambíguos (nível 2) e o revisor questiona cada ação.</p>
+          <p className="foot">Detectores de duplicidade, valor × duplicata, troca bancária e boleto são código. A IA lê só os ambíguos (nível 2) e um júri (promotor, defensor, juiz) questiona cada ação, citando só evidências reais.</p>
         </div>
       </section>
 
@@ -75,7 +74,7 @@ export default async function Page() {
       </section>
 
       <section className="card sec">
-        <div className="card-h">Revisor adversário</div>
+        <div className="card-h">Júri adversário (promotor × defensor × juiz)</div>
         <div className="pad">
           {p.revisor.rodado
             ? <p>Derrubou <strong>{p.revisor.derrubou} de {p.revisor.plantadas}</strong> ações erradas plantadas (retirar controle legítimo).</p>
