@@ -12,6 +12,11 @@ export function Excecao({ d }: { d: DecisaoLote }) {
       </summary>
       <div className="dossie">
         <p className="foot">Regra <span className="chip regra" title={d.regra}>{rotuloRegra(d.regra)}</span></p>
+        {d.nivel === 3 && (
+          <p className="msg">
+            <strong>Por que bloqueou:</strong> {d.motivo}. <strong>Por que não liberou:</strong> sinal de fraude ou fora da alçada do agente; o agente nunca libera um crítico sozinho.
+          </p>
+        )}
         {d.evidencias.length > 0 && (
           <ul className="evidencias">{d.evidencias.map((e, i) => <li key={i}>{e}</li>)}</ul>
         )}
@@ -23,7 +28,7 @@ export function Excecao({ d }: { d: DecisaoLote }) {
             </li>
           ))}
         </ol>
-        {d.pedido && <p className="msg">Dossiê enviado a {d.pedido.nome} para registro (canal simulado).</p>}
+        {d.pedido && <p className="msg"><strong>Encaminhado a {d.pedido.nome}</strong> para registro (canal simulado). Fraude vai ao jurídico; valor acima de R$ 50 mil, à diretoria financeira; demais casos, à coordenação.</p>}
       </div>
     </details>
   );

@@ -3,6 +3,7 @@
 !.env.example
 node_modules/
 data/
+.cache/
 Plano GoHacks Talent.html
 next-env.d.ts
 *.tsbuildinfo

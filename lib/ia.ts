@@ -1,4 +1,8 @@
 // Cliente do AI Proxy. Chave só em AI_PROXY_API_KEY (nunca versionada). Sem chave: devolve null e o motor falha fechado.
+import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+
 const BASE = "https://ai-proxy.gogroupbr.com/v1";
 
 export type Uso = { chamadas: number; tokensEntrada: number; tokensSaida: number; usd: number; ms: number; falhas: number };
@@ -6,9 +10,30 @@ export const usoTotal: Uso = { chamadas: 0, tokensEntrada: 0, tokensSaida: 0, us
 
 export const iaDisponivel = () => Boolean(process.env.AI_PROXY_API_KEY);
 
+// Cache de demo, opt-in (IA_CACHE=1): a 1ª execução chama a IA de verdade e grava; as seguintes respondem na hora.
+// Fica desligado nas medições (avaliar, medir, sombra), senão o custo e o tempo medidos sairiam falsos.
+const ARQ_CACHE = join(process.cwd(), ".cache", "ia.json");
+let memoria: Record<string, any> | null = null;
+const cacheLigado = () => process.env.IA_CACHE === "1";
+
+function carregar(): Record<string, any> {
+  if (memoria) return memoria;
+  try { memoria = JSON.parse(readFileSync(ARQ_CACHE, "utf8")); } catch { memoria = {}; }
+  return memoria!;
+}
+
+function gravar(chave: string, valor: any) {
+  const c = carregar();
+  c[chave] = valor;
+  try { mkdirSync(dirname(ARQ_CACHE), { recursive: true }); writeFileSync(ARQ_CACHE, JSON.stringify(c)); } catch { /* sem disco: segue sem cache */ }
+}
+
 async function post(rota: string, corpo: unknown): Promise<any | null> {
+  const k = cacheLigado() ? createHash("sha1").update(rota + JSON.stringify(corpo)).digest("hex") : "";
+  if (k && carregar()[k]) return carregar()[k];
   const r = (await tentar(rota, corpo)) ?? (await tentar(rota, corpo));
   if (!r) usoTotal.falhas++;
+  else if (k) gravar(k, r);
   return r;
 }
 
@@ -21,7 +46,7 @@ async function tentar(rota: string, corpo: unknown): Promise<any | null> {
       method: "POST",
       headers: { Authorization: `Bearer ${chave}`, "Content-Type": "application/json" },
       body: JSON.stringify(corpo),
-      signal: AbortSignal.timeout(20_000),
+      signal: AbortSignal.timeout(12_000),
     });
     if (!r.ok) return null;
     const j = await r.json();

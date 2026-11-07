@@ -9,15 +9,15 @@ type No = { id: NoId; nome: string; papel: string; tipo: "ia" | "ferramenta" | "
 type Linha = { chave: number; tipo: "titulo" | "passo" | "fim"; origem?: Passo["origem"]; agente?: string; texto: string };
 
 const NOS: No[] = [
-  { id: "triagem", nome: "Triagem", papel: "regra exata", tipo: "ferramenta", x: 9, y: 50 },
-  { id: "auditor", nome: "Auditor", papel: "1 em 20", tipo: "ia", x: 36, y: 14 },
-  { id: "investigador", nome: "Investigador", papel: "lê as evidências", tipo: "ia", x: 36, y: 50 },
-  { id: "promotor", nome: "Promotor", papel: "acusa com prova", tipo: "ia", x: 56, y: 30 },
-  { id: "defensor", nome: "Defensor", papel: "defende", tipo: "ia", x: 56, y: 70 },
-  { id: "juiz", nome: "Juiz", papel: "veredito", tipo: "ia", x: 74, y: 50 },
-  { id: "despachante", nome: "Despachante", papel: "bloqueia", tipo: "ferramenta", x: 74, y: 88 },
-  { id: "remessa", nome: "Remessa", papel: "segue ao banco", tipo: "saida", x: 93, y: 14 },
-  { id: "fora", nome: "Fora da remessa", papel: "retirado ou bloqueado", tipo: "saida", x: 93, y: 70 },
+  { id: "triagem", nome: "Triagem", papel: "regra exata", tipo: "ferramenta", x: 11, y: 50 },
+  { id: "auditor", nome: "Auditor", papel: "1 em 20", tipo: "ia", x: 35, y: 14 },
+  { id: "investigador", nome: "Investigador", papel: "lê as evidências", tipo: "ia", x: 35, y: 50 },
+  { id: "promotor", nome: "Promotor", papel: "acusa com prova", tipo: "ia", x: 54, y: 30 },
+  { id: "defensor", nome: "Defensor", papel: "defende", tipo: "ia", x: 54, y: 70 },
+  { id: "juiz", nome: "Juiz", papel: "veredito", tipo: "ia", x: 71, y: 50 },
+  { id: "despachante", nome: "Despachante", papel: "bloqueia", tipo: "ferramenta", x: 71, y: 86 },
+  { id: "remessa", nome: "Remessa", papel: "segue ao banco", tipo: "saida", x: 88, y: 14 },
+  { id: "fora", nome: "Fora da remessa", papel: "retirado ou bloqueado", tipo: "saida", x: 88, y: 70 },
 ];
 
 const ARESTAS: [NoId, NoId][] = [
@@ -51,6 +51,8 @@ export function Orquestracao({ fluxo, ids = [], casos = [], titulo }: Props) {
   const [arestas, setArestas] = useState<string[]>([]);
   const [log, setLog] = useState<Linha[]>([]);
   const [progresso, setProgresso] = useState(0);
+  const [sel, setSel] = useState<NoId | null>(null);
+  const [atual, setAtual] = useState<{ id: string; passos: Passo[] } | null>(null);
   const viva = useRef(true);
   const contador = useRef(0);
 
@@ -68,6 +70,7 @@ export function Orquestracao({ fluxo, ids = [], casos = [], titulo }: Props) {
     setVisitados([]);
     setArestas([]);
     escrever({ tipo: "titulo", texto: c.tituloId });
+    setAtual({ id: c.tituloId, passos: c.rastro });
     const chegar = (no: NoId) => {
       acesas = [...acesas, ...ARESTAS.filter(([de, para]) => para === no && vistos.includes(de)).map(([de, para]) => `${de}-${para}`)];
       vistos = [...vistos, no];
@@ -113,6 +116,9 @@ export function Orquestracao({ fluxo, ids = [], casos = [], titulo }: Props) {
     defensor: fluxo.ambiguos, juiz: fluxo.ambiguos, remessa: fluxo.limpos, fora: fluxo.ambiguos + fluxo.criticos,
   };
 
+  const estado = (id: NoId) => (ativo === id ? "rodando" : visitados.includes(id) ? "concluído" : "aguardando");
+  const dizeres = sel && atual ? atual.passos.filter((p) => NO_DO_AGENTE[p.agente] === sel) : [];
+
   return (
     <section className="palco sec" aria-label={titulo}>
       <header className="palco-h">
@@ -134,18 +140,33 @@ export function Orquestracao({ fluxo, ids = [], casos = [], titulo }: Props) {
               ))}
             </svg>
             {NOS.map((n) => (
-              <div
+              <button
+                type="button"
                 key={n.id}
-                className={`no ${n.tipo} ${visitados.includes(n.id) ? "visto" : ""} ${ativo === n.id ? "ativo" : ""} ${n.id === "remessa" ? "ok" : n.id === "fora" ? "crit" : ""}`}
+                onClick={() => setSel(sel === n.id ? null : n.id)}
+                aria-pressed={sel === n.id}
+                className={`no ${sel === n.id ? "sel" : ""} ${n.tipo} ${visitados.includes(n.id) ? "visto" : ""} ${ativo === n.id ? "ativo" : ""} ${n.id === "remessa" ? "ok" : n.id === "fora" ? "crit" : ""}`}
                 style={{ left: `${n.x}%`, top: `${n.y}%` }}
               >
                 <span className="no-n">{n.nome}</span>
                 <span className="no-p">{n.papel}</span>
+                {n.tipo !== "saida" && <span className="no-e">{estado(n.id)}</span>}
                 {contagem[n.id] !== undefined && <span className="no-c">{contagem[n.id]}</span>}
                 {n.tipo === "ia" && <i className="no-ia">IA</i>}
-              </div>
+              </button>
             ))}
           </div>
+          {sel && (
+            <div className="detalhe">
+              <strong>{POS[sel].nome}</strong> · {POS[sel].papel}
+              {contagem[sel] !== undefined && <> · {contagem[sel]} título(s) no lote</>}
+              {atual ? (
+                dizeres.length ? dizeres.map((p, i) => <p key={i}>{atual.id}: {p.texto}</p>) : <p>{atual.id}: este título não passou por aqui.</p>
+              ) : (
+                <p>Rode a conferência para ver o que este agente disse em cada título.</p>
+              )}
+            </div>
+          )}
         </div>
 
         <ol className="terminal" aria-live="polite">

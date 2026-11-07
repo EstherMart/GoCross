@@ -18,11 +18,12 @@ Pipeline por título, executado **antes** da remessa. O crítico sempre vence: u
 |-------|----------|-----------------|--------|
 | 1 · baixo | Divergência de forma, dentro da tolerância | Libera (corrige erro de digitação evidente) | Não |
 | 2 · médio | Dinheiro possivelmente indevido, ação reversível, dentro da alçada de R$ 5 mil | Retira do lote com evidência | Não |
-| 3 · crítico | Fraude, golpe ou decisão fora da alçada do agente | Bloqueia, monta dossiê e pede decisão | Sim |
+| 3 · crítico | Fraude (G04, G05), título não reconhecido ou fora da alçada do agente | Bloqueia sozinho, registra o dossiê e o encaminha ao responsável (canal simulado) | Só recebe o registro; nenhum passo espera resposta |
 
 Regras de projeto:
 - **Falha fechada:** título não reconhecido, ou IA indisponível (sem chave), não é liberado.
-- **Parte numérica em código**, determinística e barata. A IA só entra no caso ambíguo do nível 2, no parecer e na revisão.
+- **Parte numérica em código**, determinística e barata. A IA só entra no caso ambíguo do nível 2: um júri (promotor × defensor × juiz) decide. A acusação precisa citar uma evidência do código; sem prova, ou com juiz inseguro, vira bloqueio. **A IA nunca libera.**
+- **Crítico é bloqueado pelo código**, não pelo júri: em modo sombra o júri sozinho bloquearia os 5 controles legítimos (ver [METRICAS](docs/METRICAS.md)).
 - **Texto de terceiros é dado, nunca instrução** (e-mail, NF, WhatsApp). Mitiga prompt injection.
 - **Despachante por regra, não por IA:** fraude → PS08; valor acima de R$ 50 mil → PS03; demais casos críticos → PS01.
 
@@ -31,16 +32,17 @@ Regras de projeto:
 ```
 CSV (data/) → lib/dados + normalizar → lib/sinais (G01 G03 G04 G05, código)
             → lib/indices → lib/motor (nível, crítico vence)
-            → lib/agente  (Jev no ambíguo · parecer glm · revisor adversário · despachante)
-            → lib/remessa (remessa filtrada + fila de decisões) → telas Next.js
+            → lib/agente  (investigador · júri no ambíguo · auditor · despachante)
+            → lib/remessa (remessa filtrada + exceções com dossiê) → telas Next.js
 ```
 
 | Agente | Papel |
 |--------|-------|
-| Investigador | Níveis 1 e 2: coleta evidência e age |
-| Revisor adversário | Pergunta se a ação pode prejudicar pagamento legítimo e confere se o parecer só cita valores, NF e CNPJ que existem nos dados |
-| Despachante | Nível 3: dossiê, pedido de decisão, registro da resposta |
-| Auditor do limpo | Amostra fixa (1 a cada 20 títulos liberados) revisada pela IA. Só mede o risco de algo ter passado; não altera a decisão. Resultado na `/prova` |
+| Triagem | Código: regras exatas G01, G03, G04, G05 e nível |
+| Investigador | Nível 2: lê as evidências e dá o parecer |
+| Promotor × Defensor × Juiz | Júri nos ambíguos. Prova em escolha fechada entre as evidências do código; nunca libera |
+| Despachante | Nível 3: bloqueia, registra o dossiê e o encaminha (fraude → PS08; acima de R$ 50 mil → PS03; demais → PS01) |
+| Auditor do limpo | Amostra fixa (1 a cada 20 liberados) revisada pela IA. Só mede; não altera a decisão |
 
 Chamadas de IA pelo [AI Proxy](https://ai-proxy.gogroupbr.com); a chave fica só em `AI_PROXY_API_KEY`.
 
@@ -60,9 +62,10 @@ Fora do MVP: canal real de acionamento (hoje simulado na tela e declarado como t
 
 | Rota | Conteúdo |
 |------|----------|
-| `/` | Fila de remessas com semáforo por nível |
-| `/lote/[id]` | Diagnóstico final, rastro de decisão e pedidos de decisão |
-| `/prova` | Amostra, erros, código × IA, revisor, custo, **medido × inferido** |
+| `/` | Resumo da semana e fila de remessas com semáforo por nível |
+| `/lote/[id]` | Orquestração ao vivo da remessa: grafo de agentes (estado por nó, clique abre o que o agente disse) e terminal; exceções com dossiê (por que bloqueou, para quem foi); remessa final em CSV |
+
+Métricas medidas em [docs/METRICAS.md](docs/METRICAS.md); impacto esperado e hipóteses em [docs/IMPACTO.md](docs/IMPACTO.md). Para a demo sem espera, `IA_CACHE=1` grava as respostas da IA em `.cache/` na primeira execução.
 
 ## Como rodar
 
@@ -87,7 +90,8 @@ Os dados ficam em `data/` e **não são versionados**: coloque a pasta `pagament
 ## Validação e limites
 
 - Gabarito: **16/16** (ajuste 8/8, validação 8/8) e 0 falso positivo no G16. Os detectores foram ajustados olhando esses mesmos casos, **por isso não é taxa de detecção**.
-- Custo, revisor e comparação código × IA aparecem como "não medido" até a chave ser configurada e `npm run avaliar` rodar com IA.
+- Medido com IA em 07/11: 876 títulos, 94,6% liberados sem pessoa, 26 acionamentos (3%), custo de IA ~US$ 0,002 na semana, júri derrubou 3/3 ações plantadas. Linha de base humana: 100 títulos pagos com sinal (~R$ 703 mil), sem prova de que sejam erro. Tabelas em [docs/METRICAS.md](docs/METRICAS.md).
+- Valor retido não é perda evitada. Tempo da analista ainda não medido. Amostra de críticos: 4 fraudes e 5 controles, sem taxa de erro.
 - Fronteira entre níveis 2 e 3 (comprador e aprovador acima de R$ 5 mil) ainda aguarda confirmação do mentor.
 - Diferencial planejado: red team × blue team com cenários sintéticos e placar de barrados × passaram. Só com OK do mentor, separado de `data/gabarito/`.
 
@@ -100,7 +104,7 @@ lib/motor.ts       classificação por nível
 lib/agente/        IA no ambíguo, revisor e despachante
 lib/ia.ts          cliente do AI Proxy
 lib/remessa.ts     remessa filtrada e fila de decisões
-lib/prova.ts       métricas da tela /prova
+lib/prova.ts       gabarito e métricas usados por scripts/avaliar e sombra
 scripts/avaliar.ts acerto por tipologia contra o gabarito
 docs/              requisitos, gabarito, ideias, AI_LOG, handoff
 ```

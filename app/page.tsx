@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { amostraDemo, listarLotes, somarFluxos, type ResumoLote } from "@/lib/remessa";
+import { listarLotes, somarFluxos, type ResumoLote } from "@/lib/remessa";
 import { brl } from "@/lib/formato";
-import { Orquestracao } from "./Orquestracao";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +22,10 @@ export default function Page() {
     <main className="container">
       <h1>Remessas da semana</h1>
       <p className="lede">{lotes.length} lotes · {semana.total} títulos · {brl(lotes.reduce((s, l) => s + l.valor, 0))}</p>
-      <Orquestracao fluxo={semana} ids={amostraDemo()} titulo="Agentes · semana" />
+      <p className="msg resumo">
+        Na semana, {semana.limpos} de {semana.total} títulos ({((semana.limpos / semana.total) * 100).toFixed(1).replace(".", ",")}%) seguem sem ninguém olhar;
+        {" "}{semana.ambiguos} foram retirados com evidência e {semana.criticos} bloqueados. Abra uma remessa para ver os agentes conferindo.
+      </p>
       <section className="card">
         <div className="card-h">Lotes por horário de fechamento</div>
         <div className="scroll">
@@ -40,7 +42,7 @@ export default function Page() {
                   <td className="num">{l.fluxo.total}</td>
                   <td className="num">{brl(l.valor)}</td>
                   <td><Status l={l} /></td>
-                  <td><Link className="btn" href={`/lote/${l.lote}`}>Fechar remessa</Link></td>
+                  <td><Link className="btn" href={`/lote/${l.lote}`}>Abrir e conferir</Link></td>
                 </tr>
               ))}
             </tbody>

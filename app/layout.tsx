@@ -20,7 +20,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Link href="/" className="logo" role="img" aria-label="GoCross" />
           <nav className="nav">
             <Link href="/">Remessas</Link>
-            <Link href="/prova">Prova</Link>
           </nav>
         </header>
         {children}
