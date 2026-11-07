@@ -100,3 +100,24 @@ tbody tr:hover { background: #fafbfc; }
   .topbar { padding: 12px 16px; }
   .container { padding: 16px 12px 32px; }
 }
+
+/* Navegação, seções e selos */
+.nav { margin-left: auto; display: flex; gap: 16px; }
+.nav a { color: var(--text); text-decoration: none; font-weight: 600; }
+.nav a:hover { color: var(--brand); }
+.btn { display: inline-block; border: 1px solid var(--brand); color: var(--brand); border-radius: 8px; padding: 4px 12px; text-decoration: none; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.btn:hover { background: var(--brand); color: var(--brand-ink); }
+.sec { margin-bottom: 16px; }
+.pad { padding: 14px 16px; }
+.pad p { margin: 0 0 8px; }
+.mono { font-family: ui-monospace, Consolas, monospace; font-size: 12px; word-break: break-word; }
+.passo { font-size: 13px; margin-bottom: 4px; }
+.tag { display: inline-block; border-radius: 6px; padding: 0 6px; font-size: 11px; font-weight: 700; }
+.tag.codigo { background: #eef0f4; color: var(--muted); }
+.tag.ia { background: #ece8ff; color: var(--brand); }
+.chip { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 11px; font-weight: 600; background: var(--warn-bg); color: var(--warn); margin-left: 6px; }
+.chip.real { background: var(--ok-bg); color: var(--ok); }
+.chip.inf { background: var(--warn-bg); color: var(--warn); }
+.chip.pend { background: var(--crit-bg); color: var(--crit); }
+.msg { border-left: 3px solid var(--brand); background: #f7f6ff; border-radius: 6px; padding: 8px 12px; margin-bottom: 8px; font-size: 14px; }
+summary.card-h { cursor: pointer; }
