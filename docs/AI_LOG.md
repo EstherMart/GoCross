@@ -107,3 +107,9 @@ Formato de cada entrada:
 - **Pedi / IA fez / Como detectei / Correção:** pedi menos poluição e orquestração clara / IA manteve crítico esperando pessoa ("Pessoa decide", botões simulados) e trilhas com replay difícil de ler / revisando a tela / crítico vira bloqueio final do agente com dossiê registrado; home e lote mostram trilhas por risco (Triagem → Auditor IA | Investigador → Promotor × Defensor → Juiz | Despachante).
 - **Resultado (antes→depois):** [CONFIRMAR]
 - **Aprendizado:** a autonomia precisa aparecer na tela; mostrar os agentes por papel, não o resultado por título.
+
+## [14:46] Sem tela de loading no lote
+- **Tipo:** correção
+- **Pedi / IA fez / Como detectei / Correção:** pedi resolver o delay de "Abrir e conferir" / IA criou tela de loading com texto explicativo ("Triagem por regra... júri só nos ambíguos") / revisando a proposta, não quero tela intermediária / loading removido; delay atacado com cache de IA em disco aquecido (IA_CACHE=1), tentativa única na IA e fatias de 24 títulos.
+- **Resultado (antes→depois):** [CONFIRMAR]
+- **Aprendizado:** resolver a lentidão na causa, sem esconder atrás de tela de espera nem texto extra.

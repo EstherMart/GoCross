@@ -69,7 +69,15 @@ export function Orquestracao({ fluxo, ids = [], casos = [], titulo }: Props) {
   const obter = (id: string): Promise<Caso> =>
     Promise.resolve(casos.find((c) => c.tituloId === id) ?? fetch(`/api/conferir?id=${id}`).then((r) => r.json()));
 
-  const escrever = (l: Omit<Linha, "chave">) => setLog((atual) => [...atual.slice(-40),{ ...l, chave: contador.current++ }]);
+  const escrever = (l: Omit<Linha, "chave">) => setLog((atual) => [...atual, { ...l, chave: contador.current++ }]);
+
+  // Segue a última linha, a menos que a pessoa tenha rolado para cima para ler.
+  const term = useRef<HTMLOListElement>(null);
+  const colado = useRef(true);
+  useEffect(() => {
+    const t = term.current;
+    if (t && colado.current) t.scrollTop = t.scrollHeight;
+  }, [log]);
 
   async function tocar(c: Caso) {
     let vistos: NoId[] = [];
@@ -186,9 +194,14 @@ export function Orquestracao({ fluxo, ids = [], casos = [], titulo }: Props) {
       </div>
     </section>
 
-    <section className="palco sec" aria-label="Registro dos agentes">
-      <header className="palco-h"><span className="palco-t">Registro dos agentes · ao vivo</span></header>
-      <ol className="terminal" aria-live="polite">
+    <section className="registro sec" aria-label="Registro dos agentes">
+      <h2 className="registro-t">Registro</h2>
+      <ol
+        className="linha-tempo"
+        aria-live="polite"
+        ref={term}
+        onScroll={(e) => { const t = e.currentTarget; colado.current = t.scrollHeight - t.scrollTop - t.clientHeight < 24; }}
+      >
         {log.length === 0 && <li className="vazio">aguardando conferência</li>}
         {log.map((l) => (
           <li key={l.chave} className={`${l.tipo} ${l.origem ?? ""}`}>

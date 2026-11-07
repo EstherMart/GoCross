@@ -1,35 +1,32 @@
 # HANDOFF
 
 ## Objetivo
-GoCross: triagem de títulos antes do fechamento da remessa; o agente decide sozinho (libera, retira, bloqueia). Desafio "Pagamentos". Fatia: G01, G03, G04, G05 + controles G16. Congelar 15h, enviar 16h15 (o site do evento diz 16h30). Demo no localhost (dados fictícios, sem Vercel).
+GoCross: triagem de títulos antes da remessa; o agente decide sozinho (libera, retira, bloqueia). Fatia G01, G03, G04, G05 + controles G16. Código congelado; falta a entrega (enviar até 16h15). Demo local, dados fictícios.
 
 ## Funciona
-- Júri (promotor × defensor × juiz) nos ambíguos; IA nunca libera. Gabarito 16/16, 0 FP, 3/3 plantadas (antes dos ajustes de hoje).
-- Crítico: o código bloqueia e o despachante registra o dossiê (fraude → PS08; > R$ 50 mil → PS03; demais → PS01). Nomes conferidos com politicas.csv.
-- Orquestração roda sozinha ao abrir o lote (PASSO_MS = 700); grafo e registro dos agentes em seções próprias.
-- Revisão cética aplicada: evidências do chat em <dados>; júri e Auditor só aceitam número real (Number(null) era 0); valor ilegível vai a PS03; timeout da IA 12 s → 7 s.
-- Home: removido o parágrafo final "Na semana, 829 de 876...".
+- avaliar (sem cache): G01 3/3, G03 4/4, G04 3/3, G05 1/1, G16 5/5, gabarito 16/16, 0 FP, júri 3/3; 855 de 876 por código, IA em 21; US$ 0,0024. Saída em docs/ENTREGA.md.
+- Delay resolvido: tentativa única na IA, fatias de 24, cache em disco (IA_CACHE=1). Lote abre em ~0,35–1 s após reiniciar.
+- Home com busca de remessa e botão "Conferir lote". Lote em abas: Agentes | Fora da remessa | Remessa final.
+- Registro dos agentes: linha do tempo clara, rolável (460 px), segue a última linha.
 
 ## Quebrado / falta
-- Nada conferido no navegador desde as mudanças (grafo, registro, auto-run). tsc/build não rodados após os ajustes de hoje.
-- docs/ENTREGA.md não existe: números sem evidência rastreável. Rodar medir e avaliar e registrar a saída.
-- G09, G02, G14 marcados "não rodado" em REQUISITOS; G16 sem checagem contra recebimento/OC/cadastro.
-- Retry duplo em ia.ts ainda existe (pior caso ~14 s); decidir() memoriza "IA fora do ar".
-- Falta submissão: texto da seção #submissao não lido (página carrega por JS); slides PDF (até 10), formulário, GIFs, vídeo, pitch (5 min + 5 de sabatina). Red team com OK do mentor.
+- Sem cache, 12 de 146 chamadas de IA estouram 7 s (falha fecha, gabarito mantido).
+- Orquestração repete a cada 4 s e apaga o registro (proposta "rodar uma vez e manter" não aprovada).
+- Entrega: vídeo (até 2 min), GIFs, slides PDF (até 10), formulário, pitch. Relatório individual pronto em docs/RELATORIO_INDIVIDUAL.md (local, fora do git).
+- G09, G02, G14 não rodados; G16 sem conferência contra recebimento/OC/cadastro.
 
 ## Decisões
-- Grafo na remessa, não na home. Crítico bloqueado pelo código; júri só nos ambíguos.
-- Defesa: "funciona para este recorte"; retido ≠ perda evitada.
-- Demo em produção local (build + start) com IA_CACHE=1 para evitar delay; abrir RM20261112-MER (6 exceções).
+- Sem tela de loading (vetado): lentidão resolvida na causa.
+- Grafo é vitrine da demo; o agente roda no servidor sem ele.
+- Parada: cada título para no 1º estado final; júri faz 1 rodada; juiz < 60%, sem prova ou "liberar" → bloqueia; IA não responde → mantém o código.
 
 ## Armadilhas
-- Node fora do PATH: $env:Path += ";C:\Program Files\nodejs". Porta 3010: matar o node antigo antes (EADDRINUSE).
-- .next apagada; fazer npm run build antes de npm start -- -p 3010.
-- Não abrir /api/publico (expõe ia_token). Abrir os lotes uma vez para aquecer o cache.
-- Reiniciar antes de medir (memória do decidir guarda falha da IA).
+- Node fora do PATH: $env:Path += ";C:\Program Files\nodejs". Matar o node da porta 3010 antes do start.
+- Demo: npm run build; $env:IA_CACHE="1"; npm start -- -p 3010. Medições sempre sem IA_CACHE.
+- Não abrir /api/publico do site do evento na demo (expõe ia_token).
 
 ## Próxima ação
-1) npm run build e npm start -- -p 3010; conferir lote (grafo, registro, auto-run). 2) medir/avaliar e criar ENTREGA.md. 3) Colar a seção #submissao aqui; gravar GIFs/vídeo, slides, pitch.
+1) Gravar vídeo/GIFs (roteiro: busca MER → Conferir lote RM20261112-MER → Agentes → Juiz → TP431754 → CSV). 2) Slides PDF e pitch. 3) Formulário + link do GitHub público.
 
 ## Arquivos-chave
-app/{page,Orquestracao,globals.css}, app/lote/[id]/{page,Excecao}.tsx, lib/{ia,remessa,motor,formato}.ts, lib/agente/index.ts, docs/{REQUISITOS,METRICAS,IMPACTO}.md
+app/{page,Lotes,Orquestracao,globals.css}, app/lote/[id]/{page,Abas,Excecao}.tsx, lib/{ia,remessa,motor}.ts, lib/agente/index.ts, docs/{ENTREGA,AI_LOG,REQUISITOS}.md

@@ -87,8 +87,8 @@ export function listarLotes(): ResumoLote[] {
 export async function processarLote(lote: string): Promise<ResultadoLote> {
   const titulos = agenda().filter((t) => t.lote_remessa === lote);
   const decisoes: DecisaoLote[] = [];
-  for (let i = 0; i < titulos.length; i += 8) {
-    const fatia = titulos.slice(i, i + 8);
+  for (let i = 0; i < titulos.length; i += 24) {
+    const fatia = titulos.slice(i, i + 24);
     const ds = await Promise.all(fatia.map((t) => decidir(t.titulo_id)));
     ds.forEach((d, j) => decisoes.push({ ...d, valor: Number(fatia[j].valor), fornecedor: fatia[j].fornecedor_id }));
   }

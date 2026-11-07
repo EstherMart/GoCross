@@ -5,6 +5,7 @@ import { iaDisponivel } from "@/lib/ia";
 import { Orquestracao } from "../../Orquestracao";
 import { BaixarCsv } from "./BaixarCsv";
 import { Excecao } from "./Excecao";
+import { Abas } from "./Abas";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +23,9 @@ export default async function Page({ params }: { params: { id: string } }) {
       <p className="lede">{r.banco} · {r.dataPrevista} · fecha às {r.fechamento}</p>
       {!iaDisponivel() && <p className="msg">IA desligada (sem AI_PROXY_API_KEY): os ambíguos seguem retirados, nunca liberados.</p>}
 
-      <Orquestracao fluxo={r.fluxo} casos={casosDoLote} titulo="Agentes · lote" />
-
+      <Abas abas={[
+        { id: "agentes", rotulo: "Agentes", conteudo: <Orquestracao fluxo={r.fluxo} casos={casosDoLote} titulo="Agentes · lote" /> },
+        { id: "fora", rotulo: `Fora da remessa · ${r.excecoes.length}`, conteudo: (
       <section className="card sec">
         <div className="card-h">Fora da remessa · {r.excecoes.length} títulos · {brl(r.valorRetido)}</div>
         {r.excecoes.length === 0 ? (
@@ -32,7 +34,8 @@ export default async function Page({ params }: { params: { id: string } }) {
           r.excecoes.map((d) => <Excecao key={d.tituloId} d={d} />)
         )}
       </section>
-
+        ) },
+        { id: "remessa", rotulo: `Remessa final · ${r.liberados.length}`, conteudo: (
       <section className="card sec">
         <div className="card-h remessa-h">
           <span>Remessa final · {r.liberados.length} títulos · {brl(r.valorRemessa)}</span>
@@ -52,6 +55,8 @@ export default async function Page({ params }: { params: { id: string } }) {
           </div>
         </details>
       </section>
+        ) },
+      ]} />
     </main>
   );
 }

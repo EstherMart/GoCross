@@ -31,7 +31,7 @@ function gravar(chave: string, valor: any) {
 async function post(rota: string, corpo: unknown): Promise<any | null> {
   const k = cacheLigado() ? createHash("sha1").update(rota + JSON.stringify(corpo)).digest("hex") : "";
   if (k && carregar()[k]) return carregar()[k];
-  const r = (await tentar(rota, corpo)) ?? (await tentar(rota, corpo));
+  const r = await tentar(rota, corpo); // uma tentativa só: sem resposta, o motor falha fechado (retira, nunca libera)
   if (!r) usoTotal.falhas++;
   else if (k) gravar(k, r);
   return r;

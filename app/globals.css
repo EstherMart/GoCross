@@ -112,7 +112,7 @@ tbody tr:hover { background: #fafafa; }
 .detalhe { margin-top: 12px; padding: 10px 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.06); border: 1px solid var(--linha); font-size: 13px; line-height: 1.45; }
 .detalhe p { margin: 6px 0 0; color: rgba(255, 255, 255, 0.8); }
 
-.terminal { list-style: none; margin: 0; padding: 12px 14px; border-radius: 8px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--linha); font-family: var(--mono); font-size: 13px; line-height: 1.55; height: 280px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; overflow: hidden; }
+.terminal { list-style: none; margin: 0; padding: 12px 14px; border-radius: 8px; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--linha); font-family: var(--mono); font-size: 13px; line-height: 1.55; height: 460px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; overscroll-behavior: contain; }
 .terminal li { overflow-wrap: anywhere; }
 .terminal .vazio { color: rgba(255, 255, 255, 0.5); }
 .terminal .titulo { color: #fff; font-weight: 700; margin-top: 6px; }
@@ -153,3 +153,27 @@ tbody tr:hover { background: #fafafa; }
   .exc summary { grid-template-columns: 1fr auto; }
   .exc-motivo { grid-column: 1 / -1; order: 3; }
 }
+
+/* busca de remessa */
+.busca-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.busca { border: 1.5px solid var(--azul); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 13px; min-width: 240px; max-width: 100%; background: #fff; color: inherit; }
+.busca:focus { outline: 2px solid var(--lima); outline-offset: 1px; }
+
+/* abas do lote */
+.abas { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 14px; }
+.abas button { border: 1.5px solid var(--azul); background: transparent; color: var(--azul); border-radius: 999px; padding: 7px 18px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.abas button.on { background: var(--azul); color: #fff; }
+.abas button:not(.on):hover { background: #eef3fb; }
+
+/* registro dos agentes: linha do tempo clara, sem card */
+.registro-t { font-size: 15px; font-weight: 700; margin: 8px 0 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.linha-tempo { list-style: none; margin: 0; padding: 0 4px 0 0; font-size: 13.5px; line-height: 1.5; max-height: 460px; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 3px; }
+.linha-tempo li { overflow-wrap: anywhere; padding-left: 18px; position: relative; }
+.linha-tempo .vazio { color: var(--muted); padding-left: 0; }
+.linha-tempo .titulo { font-weight: 700; color: var(--text); margin-top: 10px; padding-left: 18px; }
+.linha-tempo .titulo:first-child { margin-top: 0; }
+.linha-tempo .titulo::before { content: ""; position: absolute; left: 2px; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--azul); }
+.linha-tempo .passo { color: var(--muted); border-left: 2px solid var(--border); margin-left: 6px; padding-left: 12px; }
+.linha-tempo .passo b { color: var(--text); font-weight: 600; margin-right: 4px; }
+.linha-tempo .passo.ia b { color: var(--azul); }
+.linha-tempo .fim { color: var(--ok); font-weight: 600; border-left: 2px solid var(--border); margin-left: 6px; padding-left: 12px; }
