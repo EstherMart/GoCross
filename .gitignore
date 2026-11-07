@@ -3,6 +3,7 @@
 !.env.example
 node_modules/
 data/
+Plano GoHacks Talent.html
 next-env.d.ts
 *.tsbuildinfo
 .next/

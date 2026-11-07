@@ -108,7 +108,7 @@ O desafio exige que o agente **aja nos sistemas** e **levante a mão** quando n�
 **Impacto no desenho (a decidir).** O ponto de decisão real é o **fechamento do lote**, não só o lançamento. Quando em dúvida, `acionar_pessoa` custa R$ 60; retirar do lote um título legítimo custa multa + R$ 250–3.000 de relacionamento. Aprovação automática errada custa o valor do título.
 
 ## Casos de teste
-Fonte: **GABARITO.md** (16 tipologias G01–G16, ~48 casos, manifesto em data/gabarito/gabarito.csv; ainda a montar no P2 com títulos reais). Exemplos mínimos para o primeiro ciclo:
+Fonte: **GABARITO.md** (16 tipologias G01–G16 mapeadas). **Escopo do MVP: 5 tipologias (G01, G03, G04, G05 e controles G16).** Manifesto `data/gabarito/gabarito.csv` montado em 07/11 com 16 títulos reais da agenda (origem real, nenhum injetado): G01 ×3, G03 ×4, G04 ×3, G05 ×1, G16 ×5; ajuste e validação separados. Os controles G16 ainda não foram checados contra recebimento, OC e cadastro. Exemplos do primeiro ciclo (ids genéricos; títulos reais no CSV):
 | id | entrada | esperado | grupo |
 |----|---------|----------|-------|
 | G01 | título duplicado [id] | retirar, cita título original | ajuste |
@@ -123,6 +123,22 @@ Fonte: **GABARITO.md** (16 tipologias G01–G16, ~48 casos, manifesto em data/ga
 - Processo: acerto por tipologia (ajuste e validação), falsos positivos nos controles G16, tempo e custo por título.
 - Placar em R$ contra a linha de base "assinar sem conferir"; lista do que o agente deixou passar.
 - Negócio: valor em R$ retido antes da remessa; títulos que o analista deixa de abrir.
+
+## Pontos fracos que a banca pode apontar (revisão de 07/11)
+| # | Ponto fraco | Por que a banca pode achar | Resposta / ação |
+|---|---|---|---|
+| 1 | Gabarito pequeno e escolhido por nós | 16 casos, 1 só de G05; "acerto 100%" soa circular | Dizer o n real; rótulo por evidência dos dados; mostrar o que o agente deixou passar; ajuste e validação separados |
+| 2 | Poucos "indevidos" reais | G04 é 1 fornecedor (FP4615, 3 linhas de alteração); G05 tem 1 título | Não generalizar; apresentar como prova de conceito e declarar a amostra |
+| 3 | "É só regra if/else" | Duplicidade, G03, G04 e G05 são regras em código | Mostrar 2 casos ambíguos onde a regra erra e a IA decide (Jev + parecer); citar quanto é código e quanto é IA |
+| 4 | IA ainda não existe no app | `lib/agente` tem só `TODO` | P4 antes de qualquer polimento; sem IA real a Modelagem (40%) cai |
+| 5 | Ação é simulada | Canal e resposta da pessoa são de mentira | Declarar na tela e no pitch; registrar cada ação; canal real fica como próximo passo |
+| 6 | Verificador pode concordar com tudo | Revisor adversário sem prova | Plantar 3 ações erradas e reportar quantas ele derrubou |
+| 7 | Número de impacto inferido | "Larissa confere uns poucos" é inferido; mediana de 28 dias e 48/876 são medidos | Só usar números medidos; o resto, rotular como inferido |
+| 8 | G03 não é só "zero a mais" | A maioria dos casos reais é valor a **menor** (dígito faltando) | Nomear como "valor ≠ duplicata"; tratar acima de R$ 5 mil como requer aprovação |
+| 9 | Fronteira nível 2 × 3 não validada | Comprador e aprovador acima de R$ 5 mil ainda pendentes | Perguntar ao mentor e registrar a resposta |
+| 10 | Dados injetados vs. declaração "apenas dados fornecidos" | Casos sintéticos poderiam ferir a declaração | MVP atual usa só casos reais; injetar só com OK do mentor |
+| 11 | Custo e tempo por título sem medição | Slide promete R$ 0,0X por análise | Registrar `usage` e tempo por chamada (Jev traz `estimated_cost_usd`; chat só tokens) |
+| 12 | Segurança do repositório | Chave exposta ou `data/` público | Chave só em `AI_PROXY_API_KEY`; `data/` no `.gitignore`; token `ia_token` do /api/publico não copiado |
 
 ## Outros desafios (simulados, fora da lista do site)
 Pagamento em feriado bancário ou data de agenda errada · fracionamento para fugir de alçada · NF cancelada ainda paga · pagamento sem recebimento · preço diferente do contrato · remessa rejeitada sem reprocesso · quem cadastra também aprova. Detalhes e ideias em IDEIAS.md.
